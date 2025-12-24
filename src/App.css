@@ -1,4 +1,6 @@
 .app {
+  background-color: var(--bg);
+  color: var(--text);
   display: flex;
   width: 100%;
   min-height: 100vh;

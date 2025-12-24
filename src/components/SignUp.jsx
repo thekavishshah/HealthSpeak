@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import './Auth.css';
+import './Login.css';
 
 function SignUp({ onSignUp, onSwitchToLogin }) {
   const [formData, setFormData] = useState({
-    fullName: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -25,7 +26,7 @@ function SignUp({ onSignUp, onSwitchToLogin }) {
     setError('');
 
     // Validation
-    if (!formData.fullName || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password || !formData.confirmPassword) {
       setError('Please fill in all fields');
       return;
     }
@@ -84,33 +85,66 @@ function SignUp({ onSignUp, onSwitchToLogin }) {
           )}
 
           <form onSubmit={handleSubmit} className="auth-form">
-            <div className="form-group">
-              <label htmlFor="fullName" className="form-label">Full Name</label>
-              <div className="input-wrapper">
-                <svg
-                  className="input-icon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                <input
-                  type="text"
-                  id="fullName"
-                  name="fullName"
-                  className="form-input"
-                  placeholder="John Doe"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                />
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="firstName" className="form-label">First Name</label>
+                <div className="input-wrapper">
+                  <svg
+                    className="input-icon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    className="form-input"
+                    placeholder="John"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="lastName" className="form-label">Last Name</label>
+                <div className="input-wrapper">
+                  <svg
+                    className="input-icon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    className="form-input"
+                    placeholder="Doe"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                  />
+                </div>
               </div>
             </div>
+
 
             <div className="form-group">
               <label htmlFor="email" className="form-label">Email Address</label>
@@ -298,11 +332,13 @@ function SignUp({ onSignUp, onSwitchToLogin }) {
               </button>
             </p>
           </div>
-
+          {/*
           <div className="divider">
             <span>Or continue with</span>
           </div>
+              */}
 
+                    {/*
           <div className="social-login">
             <button className="social-button">
               <svg viewBox="0 0 24 24" className="social-icon">
@@ -334,7 +370,7 @@ function SignUp({ onSignUp, onSwitchToLogin }) {
               </svg>
               GitHub
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
