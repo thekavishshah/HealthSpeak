@@ -354,6 +354,7 @@
 
   .results-content {
     padding: 1.5rem 1rem;
+    background-color: var(--bg);
   }
 
   .term-header {
@@ -364,6 +365,7 @@
 
   .term-title {
     font-size: 2rem;
+    color: var(--text);
   }
 
   .symptom-grid {

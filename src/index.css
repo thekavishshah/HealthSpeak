@@ -52,15 +52,53 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
+:root {
+  --bg: #080808;
+  --bg-elevated: #1a1a1a;
+  --text: rgba(255, 255, 255, 0.87);
+  
+}
+  
+/* LIGHT THEME */
+html[data-theme="light"] {
+  --bg: #ebecee;
+  --bg-elevated: #ffffff;
+  --sidebar-bg: #c2c2c7;
+
+  --text: #070d1a;
+  --muted: #6b7280;
+  --border-subtle: #e5e7eb;
+
+  --accent: #7c3aed;
+  --accent-soft: #ede9fe;
+  --accent-strong: #4c1d95;
+  --danger: #dc2626;
+
+  --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+/* DARK THEME */
+html[data-theme="dark"] {
+  --bg: #231F20;
+  --bg-elevated: #000205;
+  --sidebar-bg: rgb(0, 0, 0);
+
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --border-subtle: #334155;
+
+  --accent: #a78bfa;
+  --accent-soft: #312e81;
+  --accent-strong: #c4b5fd;
+  --danger: #f87171;
+
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
   a:hover {
     color: #747bff;
   }
   button {
     background-color: #f9f9f9;
   }
-}
+

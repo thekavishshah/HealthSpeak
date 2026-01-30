@@ -6,6 +6,7 @@
   padding: 2rem;
   margin-left: 260px; /* Account for sidebar width */
   width: calc(100% - 260px); /* Ensure proper width calculation */
+  position: relative;
 }
 
 .landing-content {
@@ -127,6 +128,28 @@
   transform: translateY(-2px);
 }
 
+.logout-button {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 4rem;
+
+  background-color: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text);
+
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.logout-button:hover {
+  background-color: var(--accent-soft);
+  border-color: var(--accent);
+}
+
 @media (prefers-color-scheme: light) {
   .app-subtitle {
     color: #666;
@@ -163,14 +186,15 @@
   .landing-page {
     margin-left: 0;
     padding: 1rem;
+    background-color: var(--bg); /* just added */
   }
 
   .app-title {
-    font-size: 2.5rem;
+    color: var(--text);
   }
 
   .app-subtitle {
-    font-size: 1rem;
+    color: var(--muted);
   }
 
   .search-input {

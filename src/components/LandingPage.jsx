@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './LandingPage.css';
 
-function LandingPage({ onSearch }) {
+function LandingPage({ onSearch, onLogout }) {
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearch = (e) => {
@@ -17,6 +17,15 @@ function LandingPage({ onSearch }) {
 
   return (
     <div className="landing-page">
+
+      {/* Logout button */}
+      <button
+        className="logout-button"
+        onClick={onLogout}
+      >
+        Log Out
+      </button>
+
       <div className="landing-content">
         <h1 className="app-title">HealthSpeak</h1>
         <p className="app-subtitle">
