@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16
+    container_name: healthspeak-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: healthspeak
+      POSTGRES_USER: healthspeak_user
+      POSTGRES_PASSWORD: healthspeak_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - healthspeak_pgdata:/var/lib/postgresql/data
+
+volumes:
+  healthspeak_pgdata:
