@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import './Login.css';
+import SettingsButton from "./SettingsButton"; 
+import SettingsModal from "./SettingsModal";
+import { useSettings } from "../context/SettingsContext";
 
 function SignUp({ onSignUp, onSwitchToLogin }) {
   const [formData, setFormData] = useState({
@@ -13,6 +16,7 @@ function SignUp({ onSignUp, onSwitchToLogin }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const {showSettings, setShowSettings} = useSettings();
 
   const handleChange = (e) => {
     setFormData({
@@ -60,6 +64,7 @@ function SignUp({ onSignUp, onSwitchToLogin }) {
     <div className="auth-container">
       <div className="auth-content">
         <div className="auth-card signup-card">
+          <SettingsButton onClick={() => setShowSettings(true)} />
           <div className="auth-header">
             <h1 className="auth-logo">HealthSpeak</h1>
             <p className="auth-subtitle">Create your account to get started.</p>
@@ -372,6 +377,9 @@ function SignUp({ onSignUp, onSwitchToLogin }) {
             </button>
           </div> */}
         </div>
+        {showSettings && (
+          <SettingsModal onClose={() => setShowSettings(false)} />
+        )}
       </div>
     </div>
   );

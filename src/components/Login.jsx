@@ -1,11 +1,15 @@
 import { useState } from "react";
+import SettingsButton from "./SettingsButton"; 
+import SettingsModal from "./SettingsModal";
 //import { useNavigate } from "react-router-dom";
+import { useSettings } from "../context/SettingsContext";
 import "./Login.css";
 
 function Login({ onLogin, onSwitchToSignup}) {
   const [patientId, setPatientId] = useState("");
   const [dob, setDob] = useState("");
   const [error, setError] = useState("");
+  const {showSettings, setShowSettings} = useSettings();
   //const navigate = useNavigate();
 
   const handleLogin = (e) => {
@@ -29,6 +33,7 @@ function Login({ onLogin, onSwitchToSignup}) {
     <div className="auth-container">
       <div className="auth-content">
         <div className="auth-card">
+          <SettingsButton onClick={() => setShowSettings(true)} />
           <div className="auth-header">
             <h1 className="auth-logo">HealthSpeak</h1>
             <p className="auth-subtitle">
@@ -104,8 +109,18 @@ function Login({ onLogin, onSwitchToSignup}) {
                 Create Account
               </button>
             </p>
+            <p>
+              Forgot PatientId?{" "}
+              <button 
+                className = "link-button-bold">
+                Recover Id
+              </button>
+            </p>
           </div>
         </div>
+          {showSettings && (
+            <SettingsModal onClose={() => setShowSettings(false)} />
+          )}
       </div>
     </div>
   );
