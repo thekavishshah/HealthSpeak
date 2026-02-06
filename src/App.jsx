@@ -1,17 +1,19 @@
 import { useState } from 'react'
 import './App.css'
-import Sidebar from './components/Sidebar'
-import LandingPage from './components/LandingPage'
-import ResultsPage from './components/ResultsPage'
-import Login from './components/Login'
-import SignUp from './components/SignUp'
+import Sidebar from './components/Sidebar';
+import LandingPage from './components/LandingPage';
+import ResultsPage from './components/ResultsPage';
+import Login from './components/Login';
+import SignUp from './components/SignUp';
+import ForgotId from './components/ForgotId.jsx';
+import HomePage from './components/HomePage.jsx';
 import SettingsButton from "./components/SettingsButton"; 
 import SettingsModal from "./components/SettingsModal";
 import {useSettings} from "./context/SettingsContext";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false) // Change this to true to enter main Health Speak app - bypass authentication
-  const [authView, setAuthView] = useState('login') // 'login' or 'signup'
+  const [authView, setAuthView] = useState('home') // 'login' or 'signup'
   const [currentView, setCurrentView] = useState('landing') // 'landing' or 'results'
   const [searchTerm, setSearchTerm] = useState('')
   //const [showSettings, setShowSettings] = useState(false);  //settings button
@@ -45,9 +47,16 @@ function App() {
 
   // If not authenticated, show login or signup
   if (!isAuthenticated) {
-    if (authView === 'login') {
-      return <Login onLogin={handleLogin} onSwitchToSignup={() => setAuthView('signup')}  />
-    } else {
+    if(authView =='home') {
+      return <HomePage  onSwitchToLogin={() => setAuthView('login')} />
+    }
+    else if (authView === 'login') {
+      return <Login onLogin={handleLogin} onSwitchToSignup={() => setAuthView('signup')} onSwitchToRecover={() => setAuthView('recover')} onSwitchBackToHome={() => setAuthView('home')} />
+    } else if (authView === 'recover') {
+      return <ForgotId onForgetId={handleLogin} onSwitchToLogin = {() => setAuthView('login')} />
+
+    }
+    else {
       return <SignUp onSignUp={handleSignUp} onSwitchToLogin={() => setAuthView('login')} />
     }
   }

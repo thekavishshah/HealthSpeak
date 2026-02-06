@@ -4,9 +4,9 @@ import SettingsButton from "./SettingsButton";
 import SettingsModal from "./SettingsModal";
 import { useSettings } from "../context/SettingsContext";
 
-function ForgotId({ onForgetId, onSwitchToLogin }) {
+function ForgotId({ onForgetId, onSwitchToLogin}) {
   const [formData, setFormData] = useState({
-    confirmId: ''
+    email: ''
   });
   const [error, setError] = useState('');
   const {showSettings, setShowSettings} = useSettings();
@@ -23,8 +23,8 @@ function ForgotId({ onForgetId, onSwitchToLogin }) {
     setError('');
     let emailChecker =  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     // Validation
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password || !formData.confirmPassword) {
-      setError('Please fill in all fields');
+    if (!formData.email) {
+      setError('Please enter your email to proceed further');
       return;
     }
 
@@ -40,8 +40,7 @@ function ForgotId({ onForgetId, onSwitchToLogin }) {
       */
 
     // For demo purposes, accept registration
-    console.log('Creating account for:', formData.email);
-    onSignUp();
+    console.log('Recovering patient id for the email:', formData.email);
   };
 
   return (
@@ -106,10 +105,18 @@ function ForgotId({ onForgetId, onSwitchToLogin }) {
               Recover ID
             </button>
           </form>
+          <div class="auth-footer">
+              <p>
+                Back To Sign-in{" "}
+                <button className = "link-button-bold" onClick = {onSwitchToLogin}>
+                  Sign-in
+                </button>
+              </p>
+          </div>
         </div>
-        {showSettings && (
-          <SettingsModal onClose={() => setShowSettings(false)} />
-        )}
+          {showSettings && (
+            <SettingsModal onClose={() => setShowSettings(false)} />
+          )}
       </div>
     </div>
   );

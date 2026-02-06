@@ -5,7 +5,7 @@ import SettingsModal from "./SettingsModal";
 import { useSettings } from "../context/SettingsContext";
 import "./Login.css";
 
-function Login({ onLogin, onSwitchToSignup}) {
+function Login({ onLogin, onSwitchToSignup, onSwitchToRecover, onSwitchBackToHome}) {
   const [patientId, setPatientId] = useState("");
   const [dob, setDob] = useState("");
   const [error, setError] = useState("");
@@ -97,6 +97,13 @@ function Login({ onLogin, onSwitchToSignup}) {
             >
               Continue to App
             </button>
+            <button
+              type="button"
+              className="auth-button secondary"
+              onClick={onSwitchBackToHome}
+            >
+              Back to Home
+            </button>
           </form>
 
           <div className="auth-footer">
@@ -112,7 +119,8 @@ function Login({ onLogin, onSwitchToSignup}) {
             <p>
               Forgot PatientId?{" "}
               <button 
-                className = "link-button-bold">
+                className = "link-button-bold"
+                onClick = {onSwitchToRecover}>
                 Recover Id
               </button>
             </p>
