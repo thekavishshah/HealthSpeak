@@ -1,4 +1,5 @@
 import { useTheme } from "../context/ThemeContext.jsx";
+import { useTheme } from "./ThemeContext";
 import "./SettingsModal.css";
 
 function SettingsModal({ onClose }) {
