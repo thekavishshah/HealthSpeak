@@ -7,14 +7,14 @@
   flex-direction: column;
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
   padding: 2rem;
-  gap: 2em
+  gap: 4em;
 }
 
 .header-container {
     display: flex;
     flex-direction: column;
-    padding: 3px;
     margin-bottom: 3rem;
+    padding-top: 0.3rem;
 }
 /* Using gradient as a color for background. For using gradient, wekbit background
 kit is used to clip or take a color gradient for a background to text to make the text
@@ -31,8 +31,68 @@ transparent property to make the gradient apply as the text color once clipping 
 .card-benefit-row {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: stretch;
     max-width: 1100px;
-    padding: 0 4px;
+    gap: 2rem;
+}
 
+/*
+To create a shadow when hovering over the box, we use the box-shadow to show when the shadow will appear when hovered on
+and the hover takes the box-shadow property. 
+*/
+.card-benefit {
+    background-color: white;
+    color: black;
+    padding: 4px;
+    text-align: center;
+    border-radius: 16px;
+    max-width: 320px;
+    border-width: 12px;
+    transition: box-shadow 0.25s ease;
+}
+.benefit-title {
+    align-items: stretch;
+    height: 3rem;
+    padding: 7px;
+}
+.benefit-description {
+    align-items: stretch;
+    padding-top: 2px;
+}
+.card-benefit:hover {
+    box-shadow:  0 10px 25px rgba(90, 11, 216, 0.363);
+}
+.auth-next {
+    background: linear-gradient(135deg, #646cff 0%, #747bff 100%);
+    color: white;
+    border-radius: 10px;
+    margin-top: -2rem;
+}
+.step-list {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    text-align: center;
+    align-items: stretch;
+    flex-direction: row;
+    max-width: 1100px;
+    gap: 11rem;
+}
+.step {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.Circle {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #646cff 0%, #747bff 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.app-work p {
+    max-width: 200px;
 }

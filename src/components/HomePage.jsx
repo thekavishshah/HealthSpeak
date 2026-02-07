@@ -1,5 +1,4 @@
 import './HomePage.css';
-import { useState } from "react";
 import { useSettings } from "../context/SettingsContext";
 import SettingsButton from "./SettingsButton"; 
 import SettingsModal from "./SettingsModal";
@@ -16,16 +15,33 @@ function HomePage({onSwitchToLogin}) {
             </div>
             <div className="card-benefit-row">
                 <div className="card-benefit">
-                    <h2>Clear, Simplified Medical Terms</h2>
-                    <p>Search medical terms and diagnoses explained in clear, accessible language</p>
+                    <h2 className="benefit-title">Clear, Simplified Medical Terms</h2>
+                    <p className="benefit-description">Search medical terms and diagnoses explained in clear, accessible language</p>
                 </div>
                 <div className="card-benefit">
-                    <h2>Understand Different Symptoms</h2>
-                    <p>Each search includes associated symptoms and potential causes to provide context</p>
+                    <h2 className="benefit-title">Understand Different Symptoms</h2>
+                    <p className="benefit-description">Each search includes associated symptoms and potential causes to provide context</p>
                 </div>
                 <div className="card-benefit">
-                    <h2>Cross-Referenced Concepts</h2>
-                    <p>Each search includes associated symptoms and potential causes to provide context</p>
+                    <h2 className="benefit-title">Cross-Referenced Concepts</h2>
+                    <p lassName="benefit-description">Each search includes associated symptoms and potential causes to provide context</p>
+                </div>
+            </div>
+            <div className="app-work">
+                <h2>How it works: </h2>
+                <div class="step-list">
+                    <div class="step">
+                        <div class="Circle">1</div>
+                        <p>Sign in using the  button below</p>
+                    </div>
+                    <div class="step">
+                        <div class="Circle">2</div>
+                        <p>Search up the term using search bar on main page</p>
+                    </div>
+                    <div class="step">
+                        <div class="Circle">3</div>
+                        <p>Explore clear definitions, symptoms, and related terms with helpful context</p>
+                    </div>
                 </div>
             </div>
             <button className="auth-next" onClick={onSwitchToLogin}>Sign-in</button>
