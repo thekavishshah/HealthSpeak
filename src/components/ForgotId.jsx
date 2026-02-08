@@ -4,7 +4,7 @@ import SettingsButton from "./SettingsButton";
 import SettingsModal from "./SettingsModal";
 import { useSettings } from "../context/SettingsContext";
 
-function ForgotId({ onForgetId, onSwitchToLogin}) {
+function ForgotId({ onSwitchToLogin}) {
   const [formData, setFormData] = useState({
     email: ''
   });
