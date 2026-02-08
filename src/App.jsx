@@ -53,7 +53,7 @@ function App() {
     else if (authView === 'login') {
       return <Login onLogin={handleLogin} onSwitchToSignup={() => setAuthView('signup')} onSwitchToRecover={() => setAuthView('recover')} onSwitchBackToHome={() => setAuthView('home')} />
     } else if (authView === 'recover') {
-      return <ForgotId onForgetId={handleLogin} onSwitchToLogin = {() => setAuthView('login')} />
+      return <ForgotId onSwitchToLogin = {() => setAuthView('login')} />
 
     }
     else {

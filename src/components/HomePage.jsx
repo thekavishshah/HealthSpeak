@@ -24,7 +24,7 @@ function HomePage({onSwitchToLogin}) {
                 </div>
                 <div className="card-benefit">
                     <h2 className="benefit-title">Cross-Referenced Concepts</h2>
-                    <p lassName="benefit-description">Each search includes associated symptoms and potential causes to provide context</p>
+                    <p className="benefit-description">Each search includes associated symptoms and potential causes to provide context</p>
                 </div>
             </div>
             <div className="app-work">
