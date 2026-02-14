@@ -1,7 +1,7 @@
 import './HomePage.css';
 import { useSettings } from "../context/SettingsContext";
 import SettingsButton from "./SettingsButton"; 
-import SettingsModal from "./SettingsModal";
+import SettingsModal from "./SettingsBar";
 function HomePage({onSwitchToLogin}) {
     const {showSettings, setShowSettings} = useSettings();
     return (
