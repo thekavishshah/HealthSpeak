@@ -319,16 +319,3 @@ Vite provides hot module replacement for instant updates:
 ```bash
 npm run dev
 ```
-
-## Team Collaboration
-
-All team members should:
-1. Have Docker Desktop installed and running
-2. Run `docker-compose up -d` to start the database
-3. Install dependencies in both root and `server/` directories
-4. Get their own Gemini API key (don't commit API keys!)
-5. Keep `server/.env` in `.gitignore` (already configured)
-
-## License
-
-MIT
