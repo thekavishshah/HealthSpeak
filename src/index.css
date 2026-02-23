@@ -56,6 +56,10 @@ button:focus-visible {
   --bg: #080808;
   --bg-elevated: #1a1a1a;
   --text: rgba(255, 255, 255, 0.87);
+
+  /*html[data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0);
+}*/
   
 }
   
@@ -63,11 +67,15 @@ button:focus-visible {
 html[data-theme="light"] {
   --bg: #ebecee;
   --bg-elevated: #ffffff;
-  --sidebar-bg: #c2c2c7;
+  --sidebar-bg: #e2e2ff;
 
   --text: #070d1a;
   --muted: #6b7280;
   --border-subtle: #e5e7eb;
+
+  --input-border: #999999;
+  --input-text: #111111;
+  --input-bg: #ffffff;
 
   --accent: #7c3aed;
   --accent-soft: #ede9fe;
@@ -75,17 +83,24 @@ html[data-theme="light"] {
   --danger: #dc2626;
 
   --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.08);
+
+  /*html[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}*/
 }
 
 /* DARK THEME */
 html[data-theme="dark"] {
   --bg: #231F20;
   --bg-elevated: #000205;
-  --sidebar-bg: rgb(0, 0, 0);
+  --sidebar-bg: rgb(27, 24, 24);
 
   --text: #e5e7eb;
   --muted: #9ca3af;
   --border-subtle: #334155;
+
+  --input-border: #555;
+  
 
   --accent: #a78bfa;
   --accent-soft: #312e81;

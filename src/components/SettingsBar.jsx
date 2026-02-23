@@ -1,7 +1,7 @@
 import { useTheme } from "../context/ThemeContext.jsx";
-import "./SettingsModal.css";
+import "./SettingsBar.css";
 
-function SettingsModal({ onClose }) {
+function SettingsModal({ onClose, onLogout }) {
   const { theme, setTheme } = useTheme();
 
   return (
@@ -35,6 +35,10 @@ function SettingsModal({ onClose }) {
               Dark
             </button>
           </div>
+
+          <button className="logout-button" onClick={onLogout}>
+            Log Out
+          </button>
         </section>
       </div>
     </div>
