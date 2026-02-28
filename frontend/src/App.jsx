@@ -8,7 +8,7 @@ import SignUp from './components/SignUp';
 import ForgotId from './components/ForgotId.jsx';
 import HomePage from './components/HomePage.jsx';
 import SettingsButton from "./components/SettingsButton"; 
-import SettingsModal from "./components/SettingsModal";
+import SettingsModal from "./components/SettingsBar.jsx";
 import {useSettings} from "./context/SettingsContext";
 
 function App() {
@@ -72,7 +72,7 @@ function App() {
       {currentView === 'landing' ? (
         <LandingPage
           onSearch={handleSearch}
-          onLogout={handleLogout}
+          //onLogout={handleLogout}
         />
 
       ) : (
@@ -86,7 +86,8 @@ function App() {
 
     {/* Settings panel (overlay) */}
     {showSettings && (
-    <SettingsModal onClose={() => setShowSettings(false)} />
+    <SettingsModal onClose={() => setShowSettings(false)}
+    onLogout={handleLogout} />
     )}
     </>
   );
