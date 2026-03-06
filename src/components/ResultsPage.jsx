@@ -102,6 +102,7 @@ function ResultsPage({ searchTerm, onNewSearch, onBack }) {
           <div className="loading-state">
             <div className="loading-spinner"></div>
             <p>Analyzing medical term with AI...</p>
+<<<<<<< HEAD:src/components/ResultsPage.jsx
           </div>
         )}
 
@@ -151,35 +152,93 @@ function ResultsPage({ searchTerm, onNewSearch, onBack }) {
                 <span>{symptom}</span>
               </div>
             ))}
+=======
+>>>>>>> 2772b22 (Made changes to the AI fetching):frontend/src/components/ResultsPage.jsx
           </div>
-        </section>
+        )}
 
-        <section className="info-section">
-          <h2 className="section-title">Possible Causes</h2>
-          <ul className="causes-list">
-            {resultData.causes.map((cause, index) => (
-              <li key={index} className="cause-item">{cause}</li>
-            ))}
-          </ul>
-        </section>
+        {error && (
+          <div className="error-state">
+            <h2>Unable to Load Information</h2>
+            <p>{error}</p>
+            <p>Please make sure the backend server is running on port 3001.</p>
+            <button onClick={() => window.location.reload()} className="retry-button">
+              Try Again
+            </button>
+          </div>
+        )}
 
-        <section className="info-section">
-          <h2 className="section-title">Related Terms</h2>
-          <div className="related-terms">
-            {resultData.relatedTerms.map((term, index) => (
-              <button key={index} className="related-term-button">
-                {term}
+        {!loading && !error && resultData && (
+          <>
+            <div className="term-header">
+              <h1 className="term-title">{resultData.term}</h1>
+              <button className="speak-button">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                </svg>
+                Listen
               </button>
-            ))}
-          </div>
-        </section>
+            </div>
 
+<<<<<<< HEAD:src/components/ResultsPage.jsx
         <div className="disclaimer">
           <strong>Important:</strong> This information is for educational purposes only
           and should not replace professional medical advice. Always consult with a
           healthcare provider for accurate diagnosis and treatment.
         </div>
         </>
+=======
+            <section className="info-section">
+              <h2 className="section-title">What is it?</h2>
+              <p className="section-text">{resultData.definition}</p>
+            </section>
+
+            <section className="info-section">
+              <h2 className="section-title">Common Symptoms</h2>
+              <div className="symptom-grid">
+                {resultData.symptoms && resultData.symptoms.map((symptom, index) => (
+                  <div key={index} className="symptom-card">
+                    <div className="symptom-icon">•</div>
+                    <span>{symptom}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="info-section">
+              <h2 className="section-title">Possible Causes</h2>
+              <ul className="causes-list">
+                {resultData.causes && resultData.causes.map((cause, index) => (
+                  <li key={index} className="cause-item">{cause}</li>
+                ))}
+              </ul>
+            </section>
+
+            <section className="info-section">
+              <h2 className="section-title">Related Terms</h2>
+              <div className="related-terms">
+                {resultData.relatedTerms && resultData.relatedTerms.map((term, index) => (
+                  <button key={index} className="related-term-button">
+                    {term}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <div className="disclaimer">
+              <strong>Important:</strong> {resultData.disclaimer || 'This information is for educational purposes only and should not replace professional medical advice. Always consult with a healthcare provider for accurate diagnosis and treatment.'}
+            </div>
+          </>
+>>>>>>> 2772b22 (Made changes to the AI fetching):frontend/src/components/ResultsPage.jsx
         )}
       </div>
     </div>

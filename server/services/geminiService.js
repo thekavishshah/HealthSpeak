@@ -9,7 +9,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
  */
 export async function searchMedicalTerm(term) {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const prompt = `You are a medical information assistant for HealthSpeak, a platform that simplifies medical terminology for patients.
 
@@ -60,3 +60,56 @@ Return ONLY the JSON object, no additional text.`;
     throw new Error(`Failed to fetch medical information: ${error.message}`);
   }
 }
+
+/**
+ * Generate a conversational response for a medical query
+ * @param {string} query - User's question or search query
+ * @param {Array} chatHistory - Previous conversation history
+ * @returns {Promise<Object>} Response object
+ */
+export async function getChatResponse(query, chatHistory = []) {
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+    const context = `You are a helpful medical information assistant for the HealthSpeak platform.
+You help patients understand medical terminology, conditions, and health information in simple, clear language.
+
+Guidelines:
+- Provide accurate, evidence-based medical information
+- Use plain language that patients can easily understand
+- Be empathetic and supportive
+- Always include a disclaimer about consulting healthcare professionals
+- If asked about symptoms requiring immediate attention, advise seeking emergency care
+- Do not provide specific medical diagnoses or treatment recommendations
+
+Previous conversation:
+${chatHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
+
+User Query: ${query}
+
+Provide a helpful, concise response.`;
+
+    const result = await model.generateContent(context);
+    const response = result.response;
+    const text = response.text();
+
+    return {
+      success: true,
+      response: text
+    };
+
+  } catch (error) {
+    console.error('Error generating chat response:', error);
+
+    return {
+      success: false,
+      error: error.message,
+      response: "I'm sorry, I encountered an error. Please try again."
+    };
+  }
+}
+
+export default {
+  searchMedicalTerm,
+  getChatResponse
+};
