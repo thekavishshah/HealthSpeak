@@ -17,15 +17,6 @@ function LandingPage({ onSearch, onLogout }) {
 
   return (
     <div className="landing-page">
-
-      {/* Logout button */}
-      <button
-        className="logout-button"
-        onClick={onLogout}
-      >
-        Log Out
-      </button>
-
       <div className="landing-content">
         <h1 className="app-title">HealthSpeak</h1>
         <p className="app-subtitle">

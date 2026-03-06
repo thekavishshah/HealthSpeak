@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import './Login.css';
 import SettingsButton from "./SettingsButton"; 
-import SettingsModal from "./SettingsModal";
+import SettingsModal from "./SettingsBar";
 import { useSettings } from "../context/SettingsContext";
 
-function ForgotId({ onForgetId, onSwitchToLogin}) {
+function ForgotId({ onSwitchToLogin}) {
   const [formData, setFormData] = useState({
     email: ''
   });

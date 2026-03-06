@@ -1,6 +1,6 @@
 import { useState } from "react";
 import SettingsButton from "./SettingsButton"; 
-import SettingsModal from "./SettingsModal";
+import SettingsModal from "./SettingsBar";
 //import { useNavigate } from "react-router-dom";
 import { useSettings } from "../context/SettingsContext";
 import "./Login.css";

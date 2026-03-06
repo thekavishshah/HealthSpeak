@@ -1,19 +1,16 @@
 .auth-container {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
   text-align: center;
   flex-direction: column;
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-  padding: 2rem;
-  gap: 4em;
+  gap: 3.5em;
 }
 
 .header-container {
     display: flex;
     flex-direction: column;
-    margin-bottom: 3rem;
+    margin-bottom: 2.5rem;
     padding-top: 0.3rem;
 }
 /* Using gradient as a color for background. For using gradient, wekbit background
@@ -30,7 +27,6 @@ transparent property to make the gradient apply as the text color once clipping 
 }
 .card-benefit-row {
     display: flex;
-    justify-content: center;
     align-items: stretch;
     max-width: 1100px;
     gap: 2rem;
@@ -72,9 +68,6 @@ and the hover takes the box-shadow property.
     display: flex;
     justify-content: center;
     align-items: stretch;
-    text-align: center;
-    align-items: stretch;
-    flex-direction: row;
     max-width: 1100px;
     gap: 11rem;
 }
@@ -95,4 +88,23 @@ and the hover takes the box-shadow property.
 }
 .app-work p {
     max-width: 200px;
+}
+@media(768px < width < 1200px) {
+    .card-benefit {
+        max-width: 75%;
+    }
+    .benefit-title {
+        font-size: 1.1rem;
+    }
+}
+
+@media (width <= 768px) {
+   .card-benefit-row {
+    flex-direction: column;
+   }
+   
+   .step-list {
+    flex-direction: column;
+    gap: 2rem;
+   }
 }

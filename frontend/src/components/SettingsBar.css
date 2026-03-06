@@ -1,0 +1,92 @@
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+
+  display: flex;
+  justify-content: flex-end;
+}
+
+.settings-panel {
+  width: 320px;
+  height: 100%;
+  padding: 1.5rem;
+
+  background-color: var(--bg-elevated, #1a1a1a);
+  border-left: 1px solid var(--border-subtle, #333);
+}
+
+.settings-header {
+  margin-bottom: -20px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.settings-header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.theme-options {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.theme-options button {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background-color: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.theme-options button.active {
+  border-color: var(--accent);
+  background-color: var(--accent-soft);
+}
+
+.logout-button {
+  margin-top: 40px;
+  background-color: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text);
+
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.logout-button:hover {
+  background-color: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.settings-section h3 {
+  color: var(--text);
+}
+
+.settings-header h2 {
+  color: var(--text);
+}
