@@ -12,7 +12,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
  */
 export async function getMedicalInformation(searchTerm) {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const prompt = `You are a medical information assistant helping patients understand medical terminology in plain language.
 
@@ -97,7 +97,7 @@ If the search term is not recognized as a medical term, return:
  */
 export async function getChatResponse(query, chatHistory = []) {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const context = `You are a helpful medical information assistant for the HealthSpeak platform.
 You help patients understand medical terminology, conditions, and health information in simple, clear language.
