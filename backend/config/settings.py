@@ -92,7 +92,7 @@ PASSWORD_HASHERS = [
 ]
 
 #User Creation for Account creation
-AUTH_USER_MODEL = "yourapp.Users"
+AUTH_USER_MODEL = "core.PatientUser"
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -112,7 +112,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+#This is neeeded because Django uses AutoField as the default primary key method, but to expand the range of the numbers
+#For the pairimary keys, especially with a better version of Django, it is better to specify it as BigAutoField by passing it 
+#To the default auto field variable as it will use the BigAutoiField as the customized default primary key
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 

@@ -51,8 +51,8 @@ function authenticateToken(req, res, next) {
 // initializeDatabase().catch(console.error);
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'HealthSpeak API is running' });
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'OK', message: 'HealthSpeak API is running' });
 });
 
 // ==================== Authentication Endpoints ====================
