@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './Sidebar.css';
 
-function Sidebar() {
+function Sidebar({ onOpenNotes, onGoHome }) {
   const [chatHistory, setChatHistory] = useState([
     { id: 1, title: 'Previous search 1', timestamp: '2 hours ago' },
     { id: 2, title: 'Previous search 2', timestamp: 'Yesterday' },
@@ -11,7 +11,13 @@ function Sidebar() {
   return (
     <div className="sidebar">
       <div className="sidebar-header">
-        <button className="new-chat-btn">+ New Chat</button>
+        <button className="new-chat-btn" onClick={onGoHome}>
+          Home
+        </button>
+
+        <button className="new-chat-btn notes-btn" onClick={onOpenNotes}>
+          Notes
+        </button>
       </div>
 
       <div className="chat-history">

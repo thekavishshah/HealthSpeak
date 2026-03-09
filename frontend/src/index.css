@@ -94,6 +94,7 @@ html[data-theme="dark"] {
   --bg: #231F20;
   --bg-elevated: #000205;
   --sidebar-bg: rgb(27, 24, 24);
+  --textarea: #2F2A2B;
 
   --text: #e5e7eb;
   --muted: #9ca3af;

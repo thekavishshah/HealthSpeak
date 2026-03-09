@@ -10,6 +10,7 @@ import HomePage from './components/HomePage.jsx';
 import SettingsButton from "./components/SettingsButton"; 
 import SettingsModal from "./components/SettingsBar.jsx";
 import {useSettings} from "./context/SettingsContext";
+import NotePage from "./components/NotePage.jsx";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false) // Change this to true to enter main Health Speak app - bypass authentication
@@ -18,6 +19,10 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('')
   //const [showSettings, setShowSettings] = useState(false);  //settings button
   const {showSettings, setShowSettings} = useSettings();
+
+  const handleOpenNotes = () => {
+    setCurrentView('notes');
+  }
 
   const handleLogin = () => {
     setIsAuthenticated(true)
@@ -65,22 +70,24 @@ function App() {
   return (
     <>
     <div className="app">
-      <Sidebar />
+      <Sidebar onOpenNotes={handleOpenNotes} onGoHome={handleBackToHome} />
       {/* Settings icon: visible on all pages*/}
       <SettingsButton onClick={() => setShowSettings(true)} />
 
-      {currentView === 'landing' ? (
-        <LandingPage
-          onSearch={handleSearch}
-          //onLogout={handleLogout}
+      {currentView === 'landing' && (
+        <LandingPage onSearch={handleSearch} />
+      )}
+
+      {currentView === 'results' && (
+        <ResultsPage
+          searchTerm={searchTerm}
+          onNewSearch={handleSearch}
+          onBack={handleBackToHome}
         />
+      )}
 
-      ) : (
-
-        <ResultsPage 
-        searchTerm={searchTerm} 
-        onNewSearch={handleSearch} 
-        onBack={handleBackToHome} />     
+      {currentView === 'notes' && (
+        <NotePage onBack={handleBackToHome} />
       )}
     </div>
 
