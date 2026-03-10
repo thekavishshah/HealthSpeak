@@ -5,7 +5,7 @@ import bodyParser from 'body-parser';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-import { getMedicalInformation, getChatResponse } from './services/geminiService.js';
+import { searchMedicalTerm, getChatResponse } from './services/aiService.js';
 import {
   initializeDatabase,
   saveSearchHistory,
@@ -47,12 +47,12 @@ function authenticateToken(req, res, next) {
   });
 }
 
-// Initialize database on startup
-initializeDatabase().catch(console.error);
+// Initialize database on startup (disabled for development - authentication in progress)
+// initializeDatabase().catch(console.error);
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'HealthSpeak API is running' });
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'OK', message: 'HealthSpeak API is running' });
 });
 
 // ==================== Authentication Endpoints ====================
@@ -172,8 +172,9 @@ app.post('/api/auth/login', async (req, res) => {
 /**
  * Search for medical term information
  * POST /api/search
+ * Note: Authentication temporarily disabled for development
  */
-app.post('/api/search', authenticateToken, async (req, res) => {
+app.post('/api/search', async (req, res) => {
   try {
     const { term } = req.body;
 
@@ -181,37 +182,29 @@ app.post('/api/search', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'Search term is required' });
     }
 
-    // Check cache first
-    let medicalInfo = await getCachedMedicalTerm(term);
+    console.log(`Searching for medical term: ${term}`);
 
-    if (!medicalInfo) {
-      // Fetch from Gemini AI
-      const result = await getMedicalInformation(term);
+    // Fetch from OpenAI
+    const result = await searchMedicalTerm(term);
 
-      if (!result.success) {
-        return res.status(500).json({
-          error: 'Error fetching medical information',
-          details: result.error
-        });
-      }
-
-      medicalInfo = result.data;
-
-      // Cache the result
-      await cacheMedicalTerm(term, medicalInfo);
+    if (!result.success) {
+      return res.status(500).json({
+        error: 'Error fetching medical information',
+        details: result.error
+      });
     }
-
-    // Save to search history
-    await saveSearchHistory(req.user.userId, term, medicalInfo);
 
     res.json({
       success: true,
-      data: medicalInfo
+      data: result.data
     });
 
   } catch (error) {
     console.error('Search error:', error);
-    res.status(500).json({ error: 'Error processing search request' });
+    res.status(500).json({
+      error: 'Error processing search request',
+      message: error.message
+    });
   }
 });
 
