@@ -13,15 +13,16 @@ class PatientUser(AbstractUser):
             MaxValueValidator(99999)
         ]
     )
-
-
 class MedicalTerms(models.Model):
     term = models.TextField(unique=True)
-    definition = models.TextField()
 
 class Symptom(models.Model):
     termId = models.ManyToManyField(MedicalTerms)
     symptom_name = models.CharField(max_length=255)
+
+class Definition(models.Model):
+    termId = models.ManyToManyField(MedicalTerms)
+    termDef = models.TextField()
 
 class SearchHistory(models.Model):
     searchByUser = models.ForeignKey(PatientUser, on_delete=models.CASCADE)
