@@ -25,7 +25,7 @@ function SignUp({ onSignUp, onSwitchToLogin }) {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -52,6 +52,24 @@ function SignUp({ onSignUp, onSwitchToLogin }) {
 
     if (!acceptTerms) {
       setError('Please accept the terms and conditions');
+      return;
+    }
+
+    const response = await fetch("http://localhost:8000/api/processUser/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+      }),
+    });
+    const data = await response.json();
+    if(!response.ok) {
+      setError("Error in registering user: " + data.error)
       return;
     }
 
@@ -324,7 +342,7 @@ function SignUp({ onSignUp, onSwitchToLogin }) {
               </label>
             </div>
 
-            <button type="submit" className="auth-button">
+            <button type="submit" onSubmit={handleSubmit} className="auth-button">
               Create Account
             </button>
           </form>

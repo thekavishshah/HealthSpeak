@@ -29,17 +29,17 @@ function HomePage({onSwitchToLogin}) {
             </div>
             <div className="app-work">
                 <h2>How it works: </h2>
-                <div class="step-list">
-                    <div class="step">
-                        <div class="Circle">1</div>
+                <div className="step-list">
+                    <div className="step">
+                        <div className="Circle">1</div>
                         <p>Sign in using the  button below</p>
                     </div>
-                    <div class="step">
-                        <div class="Circle">2</div>
+                    <div className="step">
+                        <div className="Circle">2</div>
                         <p>Search up the term using search bar on main page</p>
                     </div>
-                    <div class="step">
-                        <div class="Circle">3</div>
+                    <div className="step">
+                        <div className="Circle">3</div>
                         <p>Explore clear definitions, symptoms, and related terms with helpful context</p>
                     </div>
                 </div>
