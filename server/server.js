@@ -5,7 +5,7 @@ import bodyParser from 'body-parser';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-import { getMedicalInformation, getChatResponse } from './services/geminiService.js';
+import { searchMedicalTerm, getChatResponse } from './services/aiService.js';
 import {
   initializeDatabase,
   saveSearchHistory,
@@ -184,8 +184,8 @@ app.post('/api/search', async (req, res) => {
 
     console.log(`Searching for medical term: ${term}`);
 
-    // Fetch from Gemini AI
-    const result = await getMedicalInformation(term);
+    // Fetch from OpenAI
+    const result = await searchMedicalTerm(term);
 
     if (!result.success) {
       return res.status(500).json({

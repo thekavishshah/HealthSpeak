@@ -1,10 +1,10 @@
 # HealthSpeak Backend Server
 
-Backend API server for HealthSpeak with Google Gemini AI integration.
+Backend API server for HealthSpeak with OpenAI integration.
 
 ## Features
 
-- Medical term search using Gemini AI
+- Medical term search using OpenAI GPT models
 - Structured responses with definitions, symptoms, causes, and related terms
 - RESTful API endpoints
 - CORS enabled for frontend integration
@@ -12,13 +12,13 @@ Backend API server for HealthSpeak with Google Gemini AI integration.
 ## Prerequisites
 
 - Node.js (v18 or higher)
-- Gemini API key from Google AI Studio
+- OpenAI API key from OpenAI Platform
 
 ## Setup
 
-1. **Get your Gemini API Key**
-   - Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-   - Create or sign in to your Google account
+1. **Get your OpenAI API Key**
+   - Visit [OpenAI Platform](https://platform.openai.com/api-keys)
+   - Create or sign in to your OpenAI account
    - Generate a new API key
 
 2. **Configure Environment Variables**
@@ -27,9 +27,9 @@ Backend API server for HealthSpeak with Google Gemini AI integration.
    cp .env.example .env
    ```
 
-3. **Add your Gemini API key to `.env`**
+3. **Add your OpenAI API key to `.env`**
    ```
-   GEMINI_API_KEY=your_actual_api_key_here
+   OPENAI_API_KEY=your_actual_api_key_here
    PORT=3001
    ```
 
@@ -99,18 +99,18 @@ POST /api/search
 The API returns appropriate HTTP status codes:
 - `200` - Success
 - `400` - Bad request (missing term)
-- `500` - Server error (Gemini API failure)
+- `500` - Server error (OpenAI API failure)
 
 ## Dependencies
 
 - `express` - Web framework
-- `@google/generative-ai` - Gemini AI SDK
+- `openai` - OpenAI SDK
 - `dotenv` - Environment variable management
 - `cors` - CORS middleware
 
 ## Security Notes
 
 - Never commit your `.env` file
-- Keep your Gemini API key private
+- Keep your OpenAI API key private
 - Use environment variables for sensitive data
 - The `.env` file is already in `.gitignore`
