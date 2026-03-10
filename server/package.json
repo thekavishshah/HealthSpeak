@@ -1,20 +1,24 @@
 {
   "name": "healthspeak-server",
   "version": "1.0.0",
-  "description": "Backend API server for HealthSpeak with Gemini AI integration",
+  "description": "Backend API server for HealthSpeak with OpenAI integration",
   "type": "module",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js"
   },
-  "keywords": ["healthcare", "medical", "gemini", "ai"],
+  "keywords": ["healthcare", "medical", "openai", "ai"],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@google/generative-ai": "^0.21.0",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "openai": "^4.75.1",
+    "pg": "^8.11.3"
   }
 }

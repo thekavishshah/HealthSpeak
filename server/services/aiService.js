@@ -1,9 +1,11 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
 /**
  * Search for a medical term and get comprehensive information
@@ -12,8 +14,6 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
  */
 export async function searchMedicalTerm(term) {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-
     const prompt = `You are a medical information assistant for HealthSpeak, a platform that simplifies medical terminology for patients.
 
 Please provide comprehensive information about the medical term: "${term}"
@@ -37,29 +37,33 @@ Guidelines:
 
 Return ONLY the JSON object, no additional text.`;
 
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a helpful medical information assistant. Always respond with valid JSON only.'
+        },
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      temperature: 0.7,
+      response_format: { type: 'json_object' }
+    });
 
-    // Clean up the response to extract JSON
-    let jsonText = text.trim();
-
-    // Remove markdown code blocks if present
-    if (jsonText.startsWith('```json')) {
-      jsonText = jsonText.replace(/```json\n?/g, '').replace(/```\n?/g, '');
-    } else if (jsonText.startsWith('```')) {
-      jsonText = jsonText.replace(/```\n?/g, '');
-    }
+    const text = completion.choices[0].message.content;
 
     // Parse the JSON response
-    const parsedResponse = JSON.parse(jsonText);
+    const parsedResponse = JSON.parse(text);
 
     return {
       success: true,
       data: parsedResponse
     };
   } catch (error) {
-    console.error('Gemini API Error:', error);
+    console.error('OpenAI API Error:', error);
     throw new Error(`Failed to fetch medical information: ${error.message}`);
   }
 }
@@ -72,9 +76,7 @@ Return ONLY the JSON object, no additional text.`;
  */
 export async function getChatResponse(query, chatHistory = []) {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-
-    const context = `You are a helpful medical information assistant for the HealthSpeak platform.
+    const systemPrompt = `You are a helpful medical information assistant for the HealthSpeak platform.
 You help patients understand medical terminology, conditions, and health information in simple, clear language.
 
 Guidelines:
@@ -83,22 +85,39 @@ Guidelines:
 - Be empathetic and supportive
 - Always include a disclaimer about consulting healthcare professionals
 - If asked about symptoms requiring immediate attention, advise seeking emergency care
-- Do not provide specific medical diagnoses or treatment recommendations
+- Do not provide specific medical diagnoses or treatment recommendations`;
 
-Previous conversation:
-${chatHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
+    // Build messages array with system prompt and chat history
+    const messages = [
+      { role: 'system', content: systemPrompt }
+    ];
 
-User Query: ${query}
+    // Add chat history (limit to avoid token overflow)
+    chatHistory.slice(-10).forEach(msg => {
+      messages.push({
+        role: msg.role,
+        content: msg.content
+      });
+    });
 
-Provide a helpful, concise response.`;
+    // Add current query
+    messages.push({
+      role: 'user',
+      content: query
+    });
 
-    const result = await model.generateContent(context);
-    const response = result.response;
-    const text = response.text();
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: messages,
+      temperature: 0.7,
+      max_tokens: 500
+    });
+
+    const responseText = completion.choices[0].message.content;
 
     return {
       success: true,
-      response: text
+      response: responseText
     };
 
   } catch (error) {
