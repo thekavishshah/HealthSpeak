@@ -529,3 +529,219 @@
     color: #666;
   }
 }
+
+/* UMLS Medical Classification Section */
+.umls-section {
+  background: linear-gradient(135deg, rgba(100, 108, 255, 0.05) 0%, rgba(116, 123, 255, 0.05) 100%);
+  border: 1px solid #444;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.umls-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.umls-subsection {
+  padding: 1rem;
+  background-color: var(--bg);
+  border-radius: 8px;
+  border: 1px solid #333;
+}
+
+.umls-subtitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #646cff;
+  margin-bottom: 0.75rem;
+  margin-top: 0;
+}
+
+.umls-cui,
+.umls-preferred-name {
+  font-size: 0.95rem;
+  color: var(--text);
+  margin: 0.5rem 0;
+  line-height: 1.6;
+}
+
+.umls-cui strong,
+.umls-preferred-name strong {
+  color: #646cff;
+}
+
+.semantic-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.semantic-type-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: rgba(100, 108, 255, 0.1);
+  border: 1px solid #646cff;
+  border-radius: 16px;
+  color: #646cff;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.code-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.code-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background-color: var(--bg);
+  border-left: 3px solid #646cff;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.code-item:hover {
+  background-color: rgba(100, 108, 255, 0.05);
+  transform: translateX(4px);
+}
+
+.code-value {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #646cff;
+  font-size: 0.9rem;
+}
+
+.code-name {
+  color: var(--text);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.umls-definition {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background-color: var(--bg);
+  border-radius: 6px;
+  border-left: 3px solid #646cff;
+}
+
+.umls-definition:last-child {
+  margin-bottom: 0;
+}
+
+.definition-source {
+  font-size: 0.8rem;
+  color: #646cff;
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.definition-text {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.vocabulary-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.vocabulary-badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  background-color: var(--bg);
+  border: 1px solid #444;
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* Light mode styles for UMLS section */
+@media (prefers-color-scheme: light) {
+  .umls-section {
+    background: linear-gradient(135deg, rgba(100, 108, 255, 0.03) 0%, rgba(116, 123, 255, 0.03) 100%);
+    border-color: #e0e0e0;
+  }
+
+  .umls-subsection {
+    background-color: #fff;
+    border-color: #e0e0e0;
+  }
+
+  .semantic-type-badge {
+    background-color: rgba(100, 108, 255, 0.08);
+    border-color: #646cff;
+    color: #646cff;
+  }
+
+  .code-item {
+    background-color: #f8f8f8;
+  }
+
+  .code-item:hover {
+    background-color: rgba(100, 108, 255, 0.05);
+  }
+
+  .code-name {
+    color: #666;
+  }
+
+  .umls-definition {
+    background-color: #f8f8f8;
+  }
+
+  .definition-text {
+    color: #666;
+  }
+
+  .vocabulary-badge {
+    background-color: #f5f5f5;
+    border-color: #e0e0e0;
+    color: #333;
+  }
+}
+
+/* Mobile responsiveness for UMLS section */
+@media (max-width: 768px) {
+  .umls-section {
+    padding: 1rem;
+  }
+
+  .umls-subsection {
+    padding: 0.75rem;
+  }
+
+  .semantic-types,
+  .vocabulary-badges {
+    gap: 0.4rem;
+  }
+
+  .semantic-type-badge,
+  .vocabulary-badge {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.7rem;
+  }
+
+  .code-list {
+    gap: 0.4rem;
+  }
+
+  .code-item {
+    padding: 0.6rem;
+  }
+}

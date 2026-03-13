@@ -174,6 +174,97 @@ function ResultsPage({ searchTerm, onNewSearch, onBack }) {
               </div>
             </section>
 
+            {/* UMLS Medical Classification Section */}
+            {resultData.umls && (
+              <section className="info-section umls-section">
+                <h2 className="section-title">Medical Classification (UMLS)</h2>
+
+                <div className="umls-content">
+                  {/* CUI and Preferred Name */}
+                  <div className="umls-subsection">
+                    <h3 className="umls-subtitle">Concept Identifier</h3>
+                    <p className="umls-cui">
+                      <strong>CUI:</strong> {resultData.umls.cui}
+                    </p>
+                    <p className="umls-preferred-name">
+                      <strong>Preferred Name:</strong> {resultData.umls.preferredName}
+                    </p>
+                  </div>
+
+                  {/* Semantic Types */}
+                  {resultData.umls.semanticTypes && resultData.umls.semanticTypes.length > 0 && (
+                    <div className="umls-subsection">
+                      <h3 className="umls-subtitle">Medical Categories</h3>
+                      <div className="semantic-types">
+                        {resultData.umls.semanticTypes.map((type, index) => (
+                          <span key={index} className="semantic-type-badge">
+                            {type.name}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ICD-10 Codes */}
+                  {resultData.umls.icd10Codes && resultData.umls.icd10Codes.length > 0 && (
+                    <div className="umls-subsection">
+                      <h3 className="umls-subtitle">ICD-10 Codes</h3>
+                      <ul className="code-list">
+                        {resultData.umls.icd10Codes.map((code, index) => (
+                          <li key={index} className="code-item">
+                            <span className="code-value">{code.code}</span>
+                            <span className="code-name">{code.name}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* SNOMED CT Codes */}
+                  {resultData.umls.snomedCodes && resultData.umls.snomedCodes.length > 0 && (
+                    <div className="umls-subsection">
+                      <h3 className="umls-subtitle">SNOMED CT Codes</h3>
+                      <ul className="code-list">
+                        {resultData.umls.snomedCodes.map((code, index) => (
+                          <li key={index} className="code-item">
+                            <span className="code-value">{code.code}</span>
+                            <span className="code-name">{code.name}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* UMLS Definitions */}
+                  {resultData.umls.definitions && resultData.umls.definitions.length > 0 && (
+                    <div className="umls-subsection">
+                      <h3 className="umls-subtitle">Medical Definitions</h3>
+                      {resultData.umls.definitions.map((def, index) => (
+                        <div key={index} className="umls-definition">
+                          <p className="definition-source"><strong>Source:</strong> {def.source}</p>
+                          <p className="definition-text">{def.value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Source Vocabularies */}
+                  {resultData.umls.sourceVocabularies && resultData.umls.sourceVocabularies.length > 0 && (
+                    <div className="umls-subsection">
+                      <h3 className="umls-subtitle">Available in Vocabularies</h3>
+                      <div className="vocabulary-badges">
+                        {resultData.umls.sourceVocabularies.map((vocab, index) => (
+                          <span key={index} className="vocabulary-badge">
+                            {vocab}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </section>
+            )}
+
             <div className="disclaimer">
               <strong>Important:</strong> {resultData.disclaimer || 'This information is for educational purposes only and should not replace professional medical advice. Always consult with a healthcare provider for accurate diagnosis and treatment.'}
             </div>
