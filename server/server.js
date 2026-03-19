@@ -6,6 +6,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 import { searchMedicalTerm, getChatResponse } from './services/aiService.js';
+import { searchUMLSTerm } from './services/umlsService.js';
 import {
   initializeDatabase,
   saveSearchHistory,
@@ -14,6 +15,8 @@ import {
   getChatHistory,
   cacheMedicalTerm,
   getCachedMedicalTerm,
+  cacheUMLSData,
+  getCachedUMLSData,
   createUser,
   findUserByPatientId,
   findUserByEmail
@@ -173,6 +176,7 @@ app.post('/api/auth/login', async (req, res) => {
  * Search for medical term information
  * POST /api/search
  * Note: Authentication temporarily disabled for development
+ * Integrates UMLS medical knowledge base with AI-generated explanations
  */
 app.post('/api/search', async (req, res) => {
   try {
@@ -184,19 +188,87 @@ app.post('/api/search', async (req, res) => {
 
     console.log(`Searching for medical term: ${term}`);
 
-    // Fetch from OpenAI
-    const result = await searchMedicalTerm(term);
+    // Initialize response object
+    let combinedData = {
+      term: term,
+      definition: '',
+      symptoms: [],
+      causes: [],
+      relatedTerms: [],
+      umls: null // UMLS data will be added here
+    };
 
-    if (!result.success) {
+    // 1. Check UMLS cache first
+    let umlsData = await getCachedUMLSData(term);
+
+    // 2. If not cached, fetch from UMLS API
+    if (!umlsData) {
+      console.log(`Fetching UMLS data for: ${term}`);
+      const umlsResult = await searchUMLSTerm(term);
+
+      if (umlsResult.success && umlsResult.data) {
+        umlsData = umlsResult.data;
+        // Cache the UMLS result
+        try {
+          await cacheUMLSData(term, umlsData);
+          console.log(`Cached UMLS data for: ${term}`);
+        } catch (cacheError) {
+          console.error('Failed to cache UMLS data:', cacheError);
+          // Continue even if caching fails
+        }
+      } else {
+        console.warn(`UMLS lookup failed for ${term}:`, umlsResult.error);
+      }
+    } else {
+      console.log(`Using cached UMLS data for: ${term}`);
+    }
+
+    // 3. Fetch AI-generated explanation from OpenAI
+    const aiResult = await searchMedicalTerm(term);
+
+    if (!aiResult.success) {
+      // If AI fails but we have UMLS data, still return UMLS data
+      if (umlsData) {
+        return res.json({
+          success: true,
+          data: {
+            term: term,
+            definition: umlsData.definitions && umlsData.definitions.length > 0
+              ? umlsData.definitions[0].value
+              : 'No definition available',
+            symptoms: [],
+            causes: [],
+            relatedTerms: umlsData.relatedConcepts
+              ? umlsData.relatedConcepts.map(rc => rc.name)
+              : [],
+            umls: umlsData
+          }
+        });
+      }
+
       return res.status(500).json({
         error: 'Error fetching medical information',
-        details: result.error
+        details: aiResult.error
       });
+    }
+
+    // 4. Combine AI data with UMLS data
+    combinedData = {
+      ...aiResult.data,
+      umls: umlsData // Add UMLS enrichment data
+    };
+
+    // 5. If UMLS has related concepts, merge with AI's relatedTerms
+    if (umlsData && umlsData.relatedConcepts && umlsData.relatedConcepts.length > 0) {
+      const umlsRelatedTerms = umlsData.relatedConcepts.map(rc => rc.name);
+      // Combine and deduplicate related terms
+      const allRelatedTerms = [...new Set([...combinedData.relatedTerms, ...umlsRelatedTerms])];
+      combinedData.relatedTerms = allRelatedTerms.slice(0, 6); // Limit to 6 terms
     }
 
     res.json({
       success: true,
-      data: result.data
+      data: combinedData
     });
 
   } catch (error) {
