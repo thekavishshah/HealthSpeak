@@ -28,8 +28,9 @@
   transition: background-color 0.2s;
 }
 
-.notes-btn{
-  margin-top: 1rem;
+.notes-btn {
+  margin-top: auto;
+  margin-bottom: 2rem;
 }
 
 .new-chat-btn:hover {
