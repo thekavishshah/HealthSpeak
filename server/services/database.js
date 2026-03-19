@@ -78,11 +78,23 @@ export async function initializeDatabase() {
       )
     `);
 
+    // Create UMLS terms cache table (for UMLS-specific data)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS umls_terms_cache (
+        id SERIAL PRIMARY KEY,
+        term VARCHAR(255) UNIQUE NOT NULL,
+        umls_data JSONB NOT NULL,
+        cached_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // Create indexes for better performance
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_search_history_user_id ON search_history(user_id);
       CREATE INDEX IF NOT EXISTS idx_chat_history_user_id ON chat_history(user_id);
       CREATE INDEX IF NOT EXISTS idx_medical_terms_term ON medical_terms_cache(term);
+      CREATE INDEX IF NOT EXISTS idx_umls_terms_term ON umls_terms_cache(term);
     `);
 
     console.log('Database schema initialized successfully');
@@ -207,6 +219,54 @@ export async function getCachedMedicalTerm(term) {
 }
 
 /**
+ * Cache UMLS data for a medical term
+ */
+export async function cacheUMLSData(term, umlsData) {
+  try {
+    const result = await pool.query(
+      `INSERT INTO umls_terms_cache (term, umls_data)
+       VALUES ($1, $2)
+       ON CONFLICT (term)
+       DO UPDATE SET umls_data = $2, updated_at = CURRENT_TIMESTAMP
+       RETURNING *`,
+      [term.toLowerCase(), umlsData]
+    );
+    return result.rows[0];
+  } catch (error) {
+    console.error('Error caching UMLS data:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get cached UMLS data for a medical term
+ */
+export async function getCachedUMLSData(term) {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM umls_terms_cache WHERE term = $1',
+      [term.toLowerCase()]
+    );
+
+    if (result.rows.length > 0) {
+      const cached = result.rows[0];
+      // Check if cache is less than 30 days old (UMLS data changes less frequently)
+      const cacheAge = Date.now() - new Date(cached.updated_at).getTime();
+      const maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+
+      if (cacheAge < maxAge) {
+        return cached.umls_data;
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error fetching cached UMLS data:', error);
+    return null;
+  }
+}
+
+/**
  * Create a new user
  */
 export async function createUser(userData) {
@@ -271,6 +331,8 @@ export default {
   getChatHistory,
   cacheMedicalTerm,
   getCachedMedicalTerm,
+  cacheUMLSData,
+  getCachedUMLSData,
   createUser,
   findUserByPatientId,
   findUserByEmail

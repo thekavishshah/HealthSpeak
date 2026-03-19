@@ -8,10 +8,16 @@
     "start": "node server.js",
     "dev": "node --watch server.js"
   },
-  "keywords": ["healthcare", "medical", "openai", "ai"],
+  "keywords": [
+    "healthcare",
+    "medical",
+    "openai",
+    "ai"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "axios": "^1.13.6",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
