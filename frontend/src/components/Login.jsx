@@ -12,7 +12,7 @@ function Login({ onLogin, onSwitchToSignup, onSwitchToRecover, onSwitchBackToHom
   const {showSettings, setShowSettings} = useSettings();
   //const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -20,13 +20,32 @@ function Login({ onLogin, onSwitchToSignup, onSwitchToRecover, onSwitchBackToHom
       setError("Please enter your Patient ID and Date of Birth.");
       return;
     }
+    if(patientId.length != 5) {
+      setError("Invalid Patient Id. Must be 5 digits");
+      return;
+    }
 
+    const response = await fetch(`http://localhost:8000/api/processUser/?patient_id=${patientId}`, {
+      method: 'GET',
+       headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json()
+    if (!response.ok) {
+      setError("Invalid User credentials", data.error)
+      return;
+    }
+    onLogin()
+    /*
     // Prototype-only validation
     if (patientId === "HS-12345" && dob === "2000-05-04") {
       onLogin(); // Go to App.tsx
     } else {
       setError("Invalid Patient ID or Date of Birth.");
     }
+      */
+
   };
 
   return (

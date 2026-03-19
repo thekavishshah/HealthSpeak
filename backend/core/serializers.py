@@ -21,7 +21,9 @@ class PatientUserSerializer(serializers.ModelSerializer):
             try:
                 patient_id = random.randint(10000, 99999)
                 user.username=validated_data['username']
-                user.password=validated_data['password']
+                #set_password takes the password from the dictionary converted from JSON
+                #applies the argon3 hashing technique on the password and store it in model
+                user.set_password(validated_data['password'])
                 user.email=validated_data['email']
                 user.patient_id=patient_id
                 idUnique = True

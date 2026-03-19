@@ -6,12 +6,17 @@ import json
 # Create your models here.
 #Models.model parameter is not needed because when we create a user and pass it to this model, this User will anyway we stored in the model
 class PatientUser(AbstractUser):
+    #Set this to null and blank since this isn't required as input. 
+    #Is automically assigned a value by the serializer
+    #For admin, these parameters are needed because we are also a user, but the admin of the database
     patient_id = models.IntegerField(
         unique=True,
         validators=[
             MinValueValidator(10000),
             MaxValueValidator(99999)
-        ]
+        ],
+        null=True,
+        blank=True
     )
 class MedicalTerms(models.Model):
     term = models.TextField(unique=True)
