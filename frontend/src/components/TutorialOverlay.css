@@ -1,0 +1,66 @@
+.tutorial-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+
+.tutorial-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 20, 20, 0.45);
+}
+
+.tutorial-highlight {
+  position: fixed;
+  border: 2px solid #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 0 0 9999px rgba(20, 20, 20, 0.45);
+  pointer-events: none;
+  z-index: 10001;
+  transition: all 0.25s ease;
+}
+
+.tutorial-tooltip {
+  position: fixed;
+  z-index: 10002;
+  background: rgba(255, 255, 255, 0.96);
+  color: #222;
+  padding: 1rem;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 260px;
+}
+
+.tutorial-tooltip::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  transform: rotate(45deg);
+}
+
+/* Arrow directions */
+.tutorial-tooltip.right::after {
+  left: -7px;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.tutorial-tooltip.left::after {
+  right: -7px;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.tutorial-tooltip.top::after {
+  bottom: -7px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.tutorial-tooltip.bottom::after {
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+}
