@@ -10,6 +10,8 @@
   left: 0;
   top: 0;
   color: var(--text);
+  box-sizing: border-box;
+  z-index: 200;
 }
 
 .sidebar-header {
@@ -28,8 +30,9 @@
   transition: background-color 0.2s;
 }
 
-.notes-btn{
-  margin-top: 1rem;
+.notes-btn {
+  margin-top: auto;
+  margin-bottom: 2rem;
 }
 
 .new-chat-btn:hover {

@@ -66,8 +66,12 @@
   background-color: var(--accent-soft);
 }
 
+.theme-options button:hover {
+  border-color: var(--accent);
+}
+
 .logout-button {
-  margin-top: 40px;
+  margin-top: 560px;
   background-color: transparent;
   border: 1px solid var(--border-subtle);
   color: var(--text);
@@ -94,3 +98,21 @@
   margin: 0;
 }
 
+.replay-tutorial-button {
+  margin-top: 24px;
+  background-color: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text);
+
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.replay-tutorial-button:hover {
+  background-color: var(--accent-soft);
+  border-color: var(--accent);
+}
