@@ -61,7 +61,7 @@
   border: 2px solid var(--input-border);
   border-radius: 8px;
   background-color: var(--input-border--bg);
-  color: var(--input-bg);
+  color: var(--text);
   outline: none;
   transition: all 0.3s ease;
   box-sizing: border-box;

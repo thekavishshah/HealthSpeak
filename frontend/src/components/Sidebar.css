@@ -10,6 +10,8 @@
   left: 0;
   top: 0;
   color: var(--text);
+  box-sizing: border-box;
+  z-index: 200;
 }
 
 .sidebar-header {
