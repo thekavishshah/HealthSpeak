@@ -12,8 +12,11 @@ function Sidebar({ onOpenNotes, onGoHome, sidebarHistoryRef }) {
   return (
     <div className="sidebar">
       <div className="sidebar-header">
-        <button className="new-chat-btn" onClick={onGoHome}>
+        <button className="home-btn" onClick={onGoHome}>
           Home
+        </button>
+        <button className="new-chat-button" onClick={onGoHome}>
+          + New Chat
         </button>
       </div>
 
