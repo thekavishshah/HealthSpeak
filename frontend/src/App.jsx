@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useState } from 'react'
 import './App.css'
 import Sidebar from './components/Sidebar';
 import LandingPage from './components/LandingPage';
@@ -19,10 +19,6 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('')
   //const [showSettings, setShowSettings] = useState(false);  //settings button
   const {showSettings, setShowSettings} = useSettings();
-  const [showTutorial, setShowTutorial] = useState(false);
-  const [tutorialRunId, setTutorialRunId] = useState(0);
-  const sidebarHistoryRef = useRef(null);
-  const logoutButtonRef = useRef(null);
 
   const handleOpenNotes = () => {
     setCurrentView('notes');
@@ -54,26 +50,6 @@ function App() {
     setSearchTerm("");
 };
 
-useEffect(() => {
-  const seenTutorial = localStorage.getItem("seenLandingTutorial");
-  if (!seenTutorial) {
-    setShowTutorial(true);
-  }
-}, []);
-
-const handleCloseTutorial = () => {
-  localStorage.setItem("seenLandingTutorial", "true");
-  setShowTutorial(false);
-};
-
-const handleReplayTutorial = () => {
-  localStorage.removeItem("seenLandingTutorial");
-  setShowSettings(false);
-  setCurrentView("landing");
-  setShowTutorial(true);
-  setTutorialRunId((prev) => prev + 1);
-};
-
   // If not authenticated, show login or signup
   if (!isAuthenticated) {
     if(authView =='home') {
@@ -94,23 +70,12 @@ const handleReplayTutorial = () => {
   return (
     <>
     <div className="app">
-      <Sidebar
-        onOpenNotes={handleOpenNotes}
-        onGoHome={handleBackToHome}
-        sidebarHistoryRef={sidebarHistoryRef}
-        //logoutButtonRef={logoutButtonRef}
-      />
+      <Sidebar onOpenNotes={handleOpenNotes} onGoHome={handleBackToHome} />
       {/* Settings icon: visible on all pages*/}
       <SettingsButton onClick={() => setShowSettings(true)} />
 
       {currentView === 'landing' && (
-        <LandingPage
-        onSearch={handleSearch}
-        showTutorial={showTutorial}
-        onCloseTutorial={handleCloseTutorial}
-        tutorialRunId={tutorialRunId}
-        sidebarHistoryRef={sidebarHistoryRef}
-      />
+        <LandingPage onSearch={handleSearch} />
       )}
 
       {currentView === 'results' && (
@@ -128,11 +93,8 @@ const handleReplayTutorial = () => {
 
     {/* Settings panel (overlay) */}
     {showSettings && (
-    <SettingsModal
-      onClose={() => setShowSettings(false)}
-      onLogout={handleLogout}
-      onReplayTutorial={handleReplayTutorial}
-    />
+    <SettingsModal onClose={() => setShowSettings(false)}
+    onLogout={handleLogout} />
     )}
     </>
   );

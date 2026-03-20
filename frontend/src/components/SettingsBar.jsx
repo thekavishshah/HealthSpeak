@@ -1,7 +1,7 @@
 import { useTheme } from "../context/ThemeContext.jsx";
 import "./SettingsBar.css";
 
-function SettingsModal({ onClose, onLogout, onReplayTutorial }) {
+function SettingsModal({ onClose, onLogout }) {
   const { theme, setTheme } = useTheme();
 
   return (
@@ -35,14 +35,7 @@ function SettingsModal({ onClose, onLogout, onReplayTutorial }) {
               Dark
             </button>
           </div>
-          <button className="replay-tutorial-button"
-          onClick={() => {
-            console.log("Replay clicked");
-            onReplayTutorial();
-          }}
-          >
-          Replay Tutorial
-          </button>
+
           <button className="logout-button" onClick={onLogout}>
             Log Out
           </button>

@@ -29,5 +29,3 @@ server/.env
 
 #backend
 backend/venv
-__pycache__/
-*.pyc
