@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from rest_framework.parsers import JSONParser
 from .serializers import PatientUserSerializer
 from .models import PatientUser
+from django.core.mail import send_mail
 
 
 @csrf_exempt
@@ -33,6 +34,14 @@ def processUser(request):
             if serializer.is_valid():
                 serializer.save()
                 print(serializer.validated_data)
+                user_instance = serializer.instance
+                
+                send_mail(
+                    "HealthSpeak Account Created Succesfully",
+                    f"Hello! Here is your patient id: {user_instance.patient_id}",
+                    'healthspeakdonotreply@example.com',
+                    [user_instance.email]
+                )
                 return JsonResponse({
                     "message": "User created succesfully",
                 }, status=201)
