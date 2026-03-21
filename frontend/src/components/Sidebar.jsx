@@ -1,26 +1,26 @@
 import { useState } from 'react';
 import './Sidebar.css';
 
-function Sidebar({ onOpenNotes, onGoHome }) {
+function Sidebar({ onOpenNotes, onGoHome, sidebarHistoryRef }) {
   const [chatHistory, setChatHistory] = useState([
     { id: 1, title: 'Previous search 1', timestamp: '2 hours ago' },
     { id: 2, title: 'Previous search 2', timestamp: 'Yesterday' },
     { id: 3, title: 'Previous search 3', timestamp: '2 days ago' },
   ]);
 
+
   return (
     <div className="sidebar">
       <div className="sidebar-header">
-        <button className="new-chat-btn" onClick={onGoHome}>
+        <button className="home-btn" onClick={onGoHome}>
           Home
         </button>
-
-        <button className="new-chat-btn notes-btn" onClick={onOpenNotes}>
-          Notes
+        <button className="new-chat-button" onClick={onGoHome}>
+          + New Chat
         </button>
       </div>
 
-      <div className="chat-history">
+      <div className="chat-history" ref={sidebarHistoryRef}>
         <h3>Chat History</h3>
         <div className="history-list">
           {chatHistory.map((chat) => (
@@ -31,6 +31,9 @@ function Sidebar({ onOpenNotes, onGoHome }) {
           ))}
         </div>
       </div>
+        <button className="new-chat-btn notes-btn" onClick={onOpenNotes}>
+          Notes
+        </button>
     </div>
   );
 }

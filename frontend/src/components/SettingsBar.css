@@ -13,7 +13,7 @@
   height: 100%;
   padding: 1.5rem;
 
-  background-color: var(--bg-elevated, #1a1a1a);
+  background-color: var(--sidebar-bg, #1a1a1a);
   border-left: 1px solid var(--border-subtle, #333);
 }
 
@@ -38,6 +38,7 @@
   font-size: 1.2rem;
   color: var(--text);
   cursor: pointer;
+  margin-right: -20px;
 }
 
 .settings-section {
@@ -55,21 +56,29 @@
   flex: 1;
   padding: 0.75rem;
   border-radius: 8px;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--text);
   background-color: var(--bg);
   color: var(--text);
   cursor: pointer;
 }
 
 .theme-options button.active {
-  border-color: var(--accent);
-  background-color: var(--accent-soft);
+  border-color: #646cff;
+  background-color: var(--bg-elevated);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.theme-options button:hover {
+  border-color: #646cff;
+  background-color: var(--bg-elevated);
 }
 
 .logout-button {
-  margin-top: 40px;
-  background-color: transparent;
-  border: 1px solid var(--border-subtle);
+  margin-top: 560px;
+  background-color: var(--bg);
+  border: 1px solid var(--text);
   color: var(--text);
 
   padding: 0.5rem 0.9rem;
@@ -81,8 +90,8 @@
 }
 
 .logout-button:hover {
-  background-color: var(--accent-soft);
-  border-color: var(--accent);
+  background-color: var(--bg-elevated);
+  border-color: #646cff;
 }
 
 .settings-section h3 {
@@ -94,3 +103,21 @@
   margin: 0;
 }
 
+.replay-tutorial-button {
+  margin-top: 24px;
+  background-color: var(--bg);
+  border: 1px solid var(--text);
+  color: var(--text);
+
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.replay-tutorial-button:hover {
+  background-color: var(--bg-elevated);
+  border-color: #646cff;
+}
