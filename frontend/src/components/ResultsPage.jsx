@@ -8,6 +8,7 @@ function ResultsPage({ searchTerm, onNewSearch, onBack }) {
   const [resultData, setResultData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   // Fetch medical term data from backend
   useEffect(() => {
@@ -48,9 +49,70 @@ function ResultsPage({ searchTerm, onNewSearch, onBack }) {
     }
   }, [searchTerm]);
 
+  // Cleanup: Stop speech when component unmounts or search term changes
+  useEffect(() => {
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [searchTerm]);
+
   const handleSearch = (e) => {
     e.preventDefault();
     onNewSearch(query);
+  };
+
+  const handleTextToSpeech = () => {
+    // Check if browser supports speech synthesis
+    if (!('speechSynthesis' in window)) {
+      alert('Sorry, your browser does not support text-to-speech.');
+      return;
+    }
+
+    // If currently speaking, stop it
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    // Create text content to speak
+    let textToSpeak = `${resultData.term}. `;
+    textToSpeak += `Definition: ${resultData.definition}. `;
+
+    if (resultData.symptoms && resultData.symptoms.length > 0) {
+      textToSpeak += `Common symptoms include: ${resultData.symptoms.join(', ')}. `;
+    }
+
+    if (resultData.causes && resultData.causes.length > 0) {
+      textToSpeak += `Possible causes include: ${resultData.causes.join(', ')}. `;
+    }
+
+    // Create speech synthesis utterance
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+
+    // Set speech properties
+    utterance.rate = 0.9; // Slightly slower for medical terms
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+    // Handle speech events
+    utterance.onstart = () => {
+      setIsSpeaking(true);
+    };
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+    };
+
+    utterance.onerror = (event) => {
+      console.error('Speech synthesis error:', event);
+      setIsSpeaking(false);
+    };
+
+    // Start speaking
+    window.speechSynthesis.speak(utterance);
   };
 
   return (
@@ -120,7 +182,11 @@ function ResultsPage({ searchTerm, onNewSearch, onBack }) {
           <>
             <div className="term-header">
               <h1 className="term-title">{resultData.term}</h1>
-              <button className="speak-button">
+              <button
+                className={`speak-button ${isSpeaking ? 'speaking' : ''}`}
+                onClick={handleTextToSpeech}
+                title={isSpeaking ? 'Stop listening' : 'Listen to definition'}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -132,8 +198,11 @@ function ResultsPage({ searchTerm, onNewSearch, onBack }) {
                 >
                   <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
                   <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                  {isSpeaking && (
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                  )}
                 </svg>
-                Listen
+                {isSpeaking ? 'Stop' : 'Listen'}
               </button>
             </div>
 
