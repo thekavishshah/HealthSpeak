@@ -132,6 +132,35 @@
   transform: translateY(-1px);
 }
 
+.speak-button.speaking {
+  background-color: #646cff;
+  color: #fff;
+  border-color: #646cff;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.speak-button.speaking svg {
+  animation: soundWave 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(100, 108, 255, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(100, 108, 255, 0);
+  }
+}
+
+@keyframes soundWave {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
 .info-section {
   margin-bottom: 2.5rem;
 }
@@ -291,6 +320,12 @@
 
   .speak-button:hover {
     background-color: #f8f8f8;
+  }
+
+  .speak-button.speaking {
+    background-color: #646cff;
+    color: #fff;
+    border-color: #646cff;
   }
 
   .symptom-card {
