@@ -69,11 +69,13 @@ html[data-theme="light"] {
   --bg-elevated: #ffffff;
   --sidebar-bg: #e2e2ff;
 
+  --notes: #cfc4e6;
+
   --text: #070d1a;
   --muted: #6b7280;
   --border-subtle: #e5e7eb;
 
-  --input-border: #999999;
+  --input-border: #000000;
   --input-text: #111111;
   --input-bg: #ffffff;
 
@@ -96,12 +98,14 @@ html[data-theme="dark"] {
   --sidebar-bg: rgb(27, 24, 24);
   --textarea: #2F2A2B;
 
+  --notes: #2F2A2B;
+
   --text: #e5e7eb;
   --muted: #9ca3af;
   --border-subtle: #334155;
 
   --input-border: #555;
-  
+  --accent-bg: #160058;;
 
   --accent: #a78bfa;
   --accent-soft: #312e81;

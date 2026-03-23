@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './ResultsPage.css';
+import { addFavoriteTerm, isTermFavorited, removeFavoriteTerm } from "./noteStorage.js";
 
 const API_BASE_URL = 'http://localhost:3001';
 
@@ -8,7 +9,44 @@ function ResultsPage({ searchTerm, onNewSearch, onBack }) {
   const [resultData, setResultData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [savedMessage, setSavedMessage] = useState("");
+  const [favorited, setFavorited] = useState(false);
+  const [sparkle, setSparkle] = useState(false);
+  
+useEffect(() => {
+  setQuery(searchTerm);
+}, [searchTerm]);
 
+const handleCrossTermClick = (term) => {
+  setQuery(term);
+  onNewSearch(term);
+};
+
+const handleRelatedTermClick = (term) => {
+  setQuery(term);
+  onNewSearch(term);
+};
+
+const handleFavoriteToggle = () => {
+  if (!resultData) return;
+
+  setSparkle(true);
+  setTimeout(() => setSparkle(false), 500);
+
+  if (favorited) {
+    removeFavoriteTerm(resultData.term);
+    setFavorited(false);
+    setSavedMessage("Removed from notes.");
+  } else {
+    const result = addFavoriteTerm(resultData);
+    setFavorited(true);
+    setSavedMessage(
+      result.added ? "Added to notes page." : "This term is already saved."
+    );
+  }
+
+  setTimeout(() => setSavedMessage(""), 2000);
+};
   // Fetch medical term data from backend
   useEffect(() => {
     const fetchMedicalTerm = async () => {
@@ -32,6 +70,7 @@ function ResultsPage({ searchTerm, onNewSearch, onBack }) {
 
         if (data.success && data.data) {
           setResultData(data.data);
+          setFavorited(isTermFavorited(data.data.term));
         } else {
           throw new Error('Invalid response format');
         }
@@ -41,6 +80,7 @@ function ResultsPage({ searchTerm, onNewSearch, onBack }) {
       } finally {
         setLoading(false);
       }
+      
     };
 
     if (searchTerm) {
@@ -119,7 +159,30 @@ function ResultsPage({ searchTerm, onNewSearch, onBack }) {
         {!loading && !error && resultData && (
           <>
             <div className="term-header">
+            <div className="term-title-row">
               <h1 className="term-title">{resultData.term}</h1>
+              <button
+                className={`favorite-button ${favorited ? "active" : ""} ${sparkle ? "sparkle" : ""}`}
+                onClick={handleFavoriteToggle}
+                aria-label={favorited ? "Remove from favorites" : "Save to favorites"}
+                title={favorited ? "Saved to notes" : "Save to notes"}
+              >
+                <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill={favorited ? "currentColor" : "none"}
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+                <span className="sparkle-burst sparkle-1" />
+                <span className="sparkle-burst sparkle-2" />
+                <span className="sparkle-burst sparkle-3" />
+              </button>
+            </div>
               <button className="speak-button">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -136,6 +199,7 @@ function ResultsPage({ searchTerm, onNewSearch, onBack }) {
                 Listen
               </button>
             </div>
+            {savedMessage && <p className="saved-message-inline">{savedMessage}</p>}
 
             <section className="info-section">
               <h2 className="section-title">What is it?</h2>
@@ -146,10 +210,15 @@ function ResultsPage({ searchTerm, onNewSearch, onBack }) {
               <h2 className="section-title">Common Symptoms</h2>
               <div className="symptom-grid">
                 {resultData.symptoms && resultData.symptoms.map((symptom, index) => (
-                  <div key={index} className="symptom-card">
+                  <button
+                    key={index}
+                    type="button"
+                    className="symptom-card clickable-card"
+                    onClick={() => handleCrossTermClick(symptom)}
+                  >
                     <div className="symptom-icon">•</div>
                     <span>{symptom}</span>
-                  </div>
+                  </button>
                 ))}
               </div>
             </section>
@@ -167,10 +236,15 @@ function ResultsPage({ searchTerm, onNewSearch, onBack }) {
               <h2 className="section-title">Related Terms</h2>
               <div className="related-terms">
                 {resultData.relatedTerms && resultData.relatedTerms.map((term, index) => (
-                  <button key={index} className="related-term-button">
-                    {term}
-                  </button>
-                ))}
+                    <button
+                      key={index}
+                      type="button"
+                      className="related-term-button"
+                      onClick={() => handleCrossTermClick(term)}
+                    >
+                      {term}
+                    </button>
+                  ))}
               </div>
             </section>
 
