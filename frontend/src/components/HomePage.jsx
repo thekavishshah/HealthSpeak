@@ -32,7 +32,7 @@ function HomePage({onSwitchToLogin}) {
                 <div className="step-list">
                     <div className="step">
                         <div className="Circle">1</div>
-                        <p>Sign in using the  button below</p>
+                        <p>Sign in using the button below</p>
                     </div>
                     <div className="step">
                         <div className="Circle">2</div>

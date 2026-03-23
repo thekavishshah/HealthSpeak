@@ -3,108 +3,154 @@
   display: flex;
   text-align: center;
   flex-direction: column;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  align-items: center;
+
+  /* use theme background instead of hardcoded gradient */
+  background: var(--bg);
+
   gap: 3.5em;
+  color: var(--text);
 }
 
 .header-container {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 2.5rem;
-    padding-top: 0.3rem;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2.5rem;
+  padding-top: 0.3rem;
 }
-/* Using gradient as a color for background. For using gradient, wekbit background
-kit is used to clip or take a color gradient for a background to text to make the text
-have the same color as that of the gradient. we then use webkit text fill color with the
-transparent property to make the gradient apply as the text color once clipping gradient to text
-*/
+
+/* Title gradient stays */
 .auth-title {
-  background: linear-gradient(135deg, #646cff 0%, #747bff 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, #747bff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin-bottom: 0.2em;
 }
+
+/* CARDS */
+
 .card-benefit-row {
-    display: flex;
-    align-items: stretch;
-    max-width: 1100px;
-    gap: 2rem;
+  display: flex;
+  align-items: stretch;
+  max-width: 1100px;
+  gap: 2rem;
+  margin: 0 auto;
 }
 
-/*
-To create a shadow when hovering over the box, we use the box-shadow to show when the shadow will appear when hovered on
-and the hover takes the box-shadow property. 
-*/
 .card-benefit {
-    background-color: white;
-    color: black;
-    padding: 4px;
-    text-align: center;
-    border-radius: 16px;
-    max-width: 320px;
-    border-width: 12px;
-    transition: box-shadow 0.25s ease;
+  background-color: var(--bg-elevated);   /* matches rest of app */
+  color: var(--text);
+
+  padding: 1rem;
+  text-align: center;
+  border-radius: 16px;
+
+  max-width: 320px;
+  border: 1px solid var(--border-subtle);
+
+  transition: all 0.25s ease;
 }
-.benefit-title {
-    align-items: stretch;
-    height: 3rem;
-    padding: 7px;
-}
-.benefit-description {
-    align-items: stretch;
-    padding-top: 2px;
-}
+
 .card-benefit:hover {
-    box-shadow:  0 10px 25px rgba(90, 11, 216, 0.363);
+  box-shadow: 0 10px 25px rgba(100, 108, 255, 0.25);
+  transform: translateY(-2px);
 }
-.auth-next {
-    background: linear-gradient(135deg, #646cff 0%, #747bff 100%);
-    color: white;
-    border-radius: 10px;
-    margin-top: -2rem;
+
+.benefit-title {
+  height: 3rem;
+  padding: 7px;
 }
+
+.benefit-description {
+  padding-top: 2px;
+  color: var(--muted, #aaa);
+}
+
+.app-work {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--text);
+}
+
 .step-list {
-    display: flex;
-    justify-content: center;
-    align-items: stretch;
-    max-width: 1100px;
-    gap: 11rem;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  width: 100%;
+  max-width: 1100px;
+  gap: 6rem;
+  margin: 0 auto;
 }
+
 .step {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
 }
+
 .Circle {
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(135deg, #646cff 0%, #747bff 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 48px;
+  height: 48px;
+
+  /* use accent instead of hardcoded gradient */
+  background: linear-gradient(135deg, var(--accent) 0%, #747bff 100%);
+
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+  font-weight: bold;
+  margin: 0 auto;
 }
-.app-work p {
-    max-width: 200px;
+
+/* BUTTON */
+.auth-next {
+  background: linear-gradient(135deg, var(--accent) 0%, #747bff 100%);
+  color: white;
+  border-radius: 10px;
+  margin-top: -2rem;
+
+  padding: 0.75rem 1.5rem;
+  border: none;
+  cursor: pointer;
+
+  transition: all 0.2s ease;
 }
-@media(768px < width < 1200px) {
-    .card-benefit {
-        max-width: 75%;
-    }
-    .benefit-title {
-        font-size: 1.1rem;
-    }
+
+.auth-next:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(100, 108, 255, 0.3);
+}
+
+.step p {
+  max-width: 220px;
+  margin: 0.75rem auto 0;
+}
+
+@media (768px < width < 1200px) {
+  .card-benefit {
+    max-width: 75%;
+  }
+
+  .benefit-title {
+    font-size: 1.1rem;
+  }
 }
 
 @media (width <= 768px) {
-   .card-benefit-row {
+  .card-benefit-row {
     flex-direction: column;
-   }
-   
-   .step-list {
+    align-items: center;
+  }
+
+  .step-list {
     flex-direction: column;
     gap: 2rem;
-   }
+  }
 }
