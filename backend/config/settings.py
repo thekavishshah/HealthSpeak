@@ -118,6 +118,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#This is the email  of the stemp Django should connect to when sending an automated email
+"""
+EMAIL_HOST = 'smtp@gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'reachneil2@gmail.com'
+EMAIL_HOST_PASSWORD = ''
+"""
+
 #This is neeeded because Django uses AutoField as the default primary key method, but to expand the range of the numbers
 #For the pairimary keys, especially with a better version of Django, it is better to specify it as BigAutoField by passing it 
 #To the default auto field variable as it will use the BigAutoiField as the customized default primary key

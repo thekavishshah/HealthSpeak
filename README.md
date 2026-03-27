@@ -20,9 +20,11 @@ HealthSpeak bridges the communication gap between patients and healthcare provid
 - CSS3 with theme support (Light/Dark mode)
 
 **Backend:**
-- Node.js with Express
-- Google Gemini AI (@google/generative-ai)
-- CORS enabled API
+- Django 5.2.11
+- Django REST Framework
+- PostgreSQL 16
+- Docker & Docker Compose
+- Google Gemini AI integration
 
 **Database:**
 - PostgreSQL 16 (Docker)
@@ -31,7 +33,8 @@ HealthSpeak bridges the communication gap between patients and healthcare provid
 
 - Node.js (v18 or higher)
 - npm or yarn
-- Docker (for PostgreSQL - optional)
+- Docker & Docker Compose (required)
+- Python 3.12+ (included in Docker)
 - Gemini API key from Google AI Studio
 
 ## Quick Start
@@ -43,21 +46,29 @@ HealthSpeak bridges the communication gap between patients and healthcare provid
 3. Click "Create API Key"
 4. Copy your API key
 
-### 2. Setup Backend Server
+### 2. Setup Backend with Docker
 
 ```bash
-# Navigate to server directory
-cd server
+# Clone the repository (if not already done)
+git clone <repository-url>
+cd HealthSpeak
 
-# Install dependencies
-npm install
+# Start Docker containers (PostgreSQL + Django backend)
+docker compose up -d
 
-# Configure environment variables
-cp .env.example .env
+# Wait for containers to start, then run migrations
+docker compose exec web python manage.py migrate
 
-# Edit .env and add your Gemini API key
-# GEMINI_API_KEY=your_actual_api_key_here
+# Create the default superuser (both you and your team can use these credentials)
+docker compose exec web python manage.py init_superuser
 ```
+
+**Default Admin Credentials:**
+- Username: `healthspeakAdmin`
+- Password: `sundevils123`
+- Admin URL: `http://localhost:8000/admin/`
+
+Note: Everyone on your team should run `init_superuser` to get the same admin credentials.
 
 ### 3. Setup Frontend
 
@@ -71,16 +82,20 @@ npm install
 
 ### 4. Run the Application
 
-You need to run both the backend and frontend servers:
+**Backend (Django + PostgreSQL):**
+The backend is already running via Docker Compose on `http://localhost:8000`
 
-**Terminal 1 - Backend Server:**
+To view logs:
 ```bash
-cd server
-npm run dev
+docker compose logs -f web
 ```
-Server will start on `http://localhost:3001`
 
-**Terminal 2 - Frontend:**
+To stop the backend:
+```bash
+docker compose down
+```
+
+**Frontend:**
 ```bash
 npm run dev
 ```
@@ -141,12 +156,12 @@ HealthSpeak/
 
 #### Health Check
 ```
-GET http://localhost:3001/api/health
+GET http://localhost:8000/api/health
 ```
 
 #### Search Medical Term
 ```
-POST http://localhost:3001/api/search
+POST http://localhost:8000/api/search
 Content-Type: application/json
 
 {
@@ -177,19 +192,38 @@ npm run build        # Build for production
 npm run preview      # Preview production build
 ```
 
-### Backend Development
+### Backend Development (Django)
+
 ```bash
-cd server
-npm run dev          # Start with auto-reload
-npm start            # Start production server
+# Start containers in development mode
+docker compose up
+
+# Run Django management commands
+docker compose exec web python manage.py <command>
+
+# Create migrations after model changes
+docker compose exec web python manage.py makemigrations
+
+# Apply migrations
+docker compose exec web python manage.py migrate
+
+# Access Django shell
+docker compose exec web python manage.py shell
+
+# Create/reset superuser credentials
+docker compose exec web python manage.py init_superuser
 ```
 
 ## Environment Variables
 
-### Backend (.env in server/)
-```
-GEMINI_API_KEY=your_gemini_api_key_here
-PORT=3001
+### Backend (Django Settings)
+Django settings are in `/backend/config/settings.py`
+
+Database credentials are configured in `docker-compose.yml`:
+```yaml
+POSTGRES_DB: healthspeak
+POSTGRES_USER: healthspeak_user
+POSTGRES_PASSWORD: healthspeak_pass
 ```
 
 ## Security Notes
@@ -201,15 +235,33 @@ PORT=3001
 
 ## Troubleshooting
 
-### Backend server won't start
-- Ensure Node.js v18+ is installed: `node --version`
-- Check if port 3001 is available
-- Verify your Gemini API key is correctly set in `.env`
+### Docker containers won't start
+- Ensure Docker is running: `docker --version`
+- Check if ports 8000 and 5432 are available
+- Try rebuilding containers: `docker compose up --build`
+- View container logs: `docker compose logs`
+
+### Backend server errors
+- Check container status: `docker compose ps`
+- View Django logs: `docker compose logs web`
+- Restart containers: `docker compose restart`
+- If timezone errors occur, ensure Dockerfile uses `python:3.12-slim` (not `python:3`)
+
+### Cannot access admin page
+- Ensure containers are running: `docker compose ps`
+- Run the superuser command: `docker compose exec web python manage.py init_superuser`
+- Access admin at: `http://localhost:8000/admin/`
+- Use credentials: `healthspeakAdmin` / `sundevils123`
 
 ### Frontend can't connect to backend
-- Ensure backend server is running on port 3001
+- Ensure backend server is running on port 8000: `curl http://localhost:8000/admin/`
 - Check browser console for CORS errors
-- Verify `API_BASE_URL` in ResultsPage.jsx matches your backend URL
+- Verify CORS settings in `backend/config/settings.py`
+
+### Database connection issues
+- Ensure PostgreSQL container is running: `docker compose ps db`
+- Check database logs: `docker compose logs db`
+- Verify database credentials in `docker-compose.yml` match `settings.py`
 
 ### Gemini API errors
 - Check if your API key is valid

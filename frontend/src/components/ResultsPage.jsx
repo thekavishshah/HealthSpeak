@@ -264,7 +264,11 @@ function ResultsPage({ searchTerm, onNewSearch, onBack }) {
                   {isSpeaking && (
                     <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
                   )}
+                  {isSpeaking && (
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                  )}
                 </svg>
+                {isSpeaking ? 'Stop' : 'Listen'}
                 {isSpeaking ? 'Stop' : 'Listen'}
               </button>
             </div>
