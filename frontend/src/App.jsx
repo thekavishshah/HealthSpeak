@@ -22,6 +22,7 @@ function App() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialRunId, setTutorialRunId] = useState(0);
   const sidebarHistoryRef = useRef(null);
+  const notesRef = useRef(null);
   const logoutButtonRef = useRef(null);
 
   const handleOpenNotes = () => {
@@ -98,6 +99,7 @@ const handleReplayTutorial = () => {
         onOpenNotes={handleOpenNotes}
         onGoHome={handleBackToHome}
         sidebarHistoryRef={sidebarHistoryRef}
+        notesRef={notesRef}
         //logoutButtonRef={logoutButtonRef}
       />
       {/* Settings icon: visible on all pages*/}
@@ -106,6 +108,7 @@ const handleReplayTutorial = () => {
       {currentView === 'landing' && (
         <LandingPage
         onSearch={handleSearch}
+        onOpenNotes={handleOpenNotes}
         showTutorial={showTutorial}
         onCloseTutorial={handleCloseTutorial}
         tutorialRunId={tutorialRunId}
