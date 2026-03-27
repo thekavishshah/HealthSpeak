@@ -27,6 +27,7 @@ export async function searchUMLSTerm(term) {
       apiKey: apiKey,
       pageSize: 5,
       returnIdType: 'concept'
+      //potential additional parameter: searchType: 'normalizedString'
     };
 
     const searchResponse = await axios.get(searchUrl, { params: searchParams });
@@ -186,10 +187,7 @@ async function getConceptDefinitions(cui, apiKey) {
 
     const results = response.data.result || [];
 
-    return results.map(def => ({
-      source: def.rootSource,
-      value: def.value
-    }));
+    return cleanAndFilterDefinitions(results);
 
   } catch (error) {
     console.error('Error fetching definitions:', error.message);
@@ -259,3 +257,90 @@ export default {
   searchUMLSTerm,
   getCrosswalk
 };
+
+function stripHtml(html = "") {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function normalizeDefinitionText(text = "") {
+  return stripHtml(text)
+    .replace(/~/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/\(\s+/g, "(")
+    .replace(/\s+\)/g, ")")
+    .trim();
+}
+
+function looksEnglish(text = "") {
+  if (!text) return false;
+
+  // very lightweight heuristic:
+  // reject obvious non-English diacritics-heavy text
+  const nonEnglishChars = (text.match(/[ěščřžýáíéúůťďňôäöüßç]/gi) || []).length;
+  const asciiChars = (text.match(/[a-z0-9 ,.'()/%:-]/gi) || []).length;
+
+  return asciiChars >= nonEnglishChars * 4;
+}
+
+function isUsefulDefinition(text = "") {
+  if (!text) return false;
+  if (text.length < 40) return false;
+  if (/^none$/i.test(text)) return false;
+  return true;
+}
+
+function dedupeDefinitions(definitions = []) {
+  const seen = new Set();
+
+  return definitions.filter((def) => {
+    const key = def.value
+      .toLowerCase()
+      .replace(/[^\w\s]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function rankDefinitionSource(source = "") {
+  const preferred = [
+    "MEDLINEPLUS",
+    "NCI",
+    "HPO",
+    "MSH",
+    "SNOMEDCT_US"
+  ];
+
+  const index = preferred.indexOf(source);
+  return index === -1 ? 999 : index;
+}
+
+function cleanAndFilterDefinitions(results = []) {
+  const cleaned = results
+    .map((def) => ({
+      source: def.rootSource,
+      value: normalizeDefinitionText(def.value),
+    }))
+    .filter((def) => isUsefulDefinition(def.value))
+    .filter((def) => looksEnglish(def.value))
+    .filter((def) => !["MSHCZE"].includes(def.source))
+    .sort((a, b) => {
+      const sourceDiff = rankDefinitionSource(a.source) - rankDefinitionSource(b.source);
+      if (sourceDiff !== 0) return sourceDiff;
+      return a.value.length - b.value.length; // prefer shorter, cleaner definitions
+    });
+
+  return dedupeDefinitions(cleaned).slice(0, 2);
+}
