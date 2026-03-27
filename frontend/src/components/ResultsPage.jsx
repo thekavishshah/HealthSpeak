@@ -9,44 +9,15 @@ function ResultsPage({ searchTerm, onNewSearch, onBack }) {
   const [resultData, setResultData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [savedMessage, setSavedMessage] = useState("");
   const [favorited, setFavorited] = useState(false);
   const [sparkle, setSparkle] = useState(false);
-  
-useEffect(() => {
-  setQuery(searchTerm);
-}, [searchTerm]);
 
-const handleCrossTermClick = (term) => {
-  setQuery(term);
-  onNewSearch(term);
-};
+  useEffect(() => {
+    setQuery(searchTerm);
+  }, [searchTerm]);
 
-const handleRelatedTermClick = (term) => {
-  setQuery(term);
-  onNewSearch(term);
-};
-
-const handleFavoriteToggle = () => {
-  if (!resultData) return;
-
-  setSparkle(true);
-  setTimeout(() => setSparkle(false), 500);
-
-  if (favorited) {
-    removeFavoriteTerm(resultData.term);
-    setFavorited(false);
-    setSavedMessage("Removed from notes.");
-  } else {
-    const result = addFavoriteTerm(resultData);
-    setFavorited(true);
-    setSavedMessage(
-      result.added ? "Added to notes page." : "This term is already saved."
-    );
-  }
-
-  setTimeout(() => setSavedMessage(""), 2000);
-};
   // Fetch medical term data from backend
   useEffect(() => {
     const fetchMedicalTerm = async () => {
@@ -80,7 +51,6 @@ const handleFavoriteToggle = () => {
       } finally {
         setLoading(false);
       }
-      
     };
 
     if (searchTerm) {
@@ -88,15 +58,98 @@ const handleFavoriteToggle = () => {
     }
   }, [searchTerm]);
 
+  // Stop speech when component unmounts or search term changes
+  useEffect(() => {
+    return () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [searchTerm]);
+
   const handleSearch = (e) => {
     e.preventDefault();
     onNewSearch(query);
   };
 
+  const handleCrossTermClick = (term) => {
+    setQuery(term);
+    onNewSearch(term);
+  };
+
+  const handleFavoriteToggle = () => {
+    if (!resultData) return;
+
+    setSparkle(true);
+    setTimeout(() => setSparkle(false), 500);
+
+    if (favorited) {
+      removeFavoriteTerm(resultData.term);
+      setFavorited(false);
+      setSavedMessage("Removed from notes.");
+    } else {
+      const result = addFavoriteTerm(resultData);
+      setFavorited(true);
+      setSavedMessage(
+        result.added ? "Added to notes page." : "This term is already saved."
+      );
+    }
+
+    setTimeout(() => setSavedMessage(""), 2000);
+  };
+
+  const handleTextToSpeech = () => {
+    if (!resultData) return;
+
+    if (!('speechSynthesis' in window)) {
+      alert('Sorry, your browser does not support text-to-speech.');
+      return;
+    }
+
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    let textToSpeak = `${resultData.term}. `;
+    textToSpeak += `Definition: ${resultData.definition}. `;
+
+    if (resultData.symptoms && resultData.symptoms.length > 0) {
+      textToSpeak += `Common symptoms include: ${resultData.symptoms.join(', ')}. `;
+    }
+
+    if (resultData.causes && resultData.causes.length > 0) {
+      textToSpeak += `Possible causes include: ${resultData.causes.join(', ')}. `;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+
+    utterance.rate = 0.9;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+    utterance.onstart = () => {
+      setIsSpeaking(true);
+    };
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+    };
+
+    utterance.onerror = (event) => {
+      console.error('Speech synthesis error:', event);
+      setIsSpeaking(false);
+    };
+
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+  };
+
   return (
     <div className="results-page">
       <div className="search-bar-compact">
-        <button onClick={onBack} className="back-button">
+        <button onClick={onBack} className="back-button" type="button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -111,6 +164,7 @@ const handleFavoriteToggle = () => {
           </svg>
           Back
         </button>
+
         <form onSubmit={handleSearch} className="search-form-compact">
           <div className="search-box-compact">
             <svg
@@ -150,7 +204,11 @@ const handleFavoriteToggle = () => {
             <h2>Unable to Load Information</h2>
             <p>{error}</p>
             <p>Please make sure the backend server is running on port 3001.</p>
-            <button onClick={() => window.location.reload()} className="retry-button">
+            <button
+              onClick={() => window.location.reload()}
+              className="retry-button"
+              type="button"
+            >
               Try Again
             </button>
           </div>
@@ -159,31 +217,39 @@ const handleFavoriteToggle = () => {
         {!loading && !error && resultData && (
           <>
             <div className="term-header">
-            <div className="term-title-row">
-              <h1 className="term-title">{resultData.term}</h1>
+              <div className="term-title-row">
+                <h1 className="term-title">{resultData.term}</h1>
+
+                <button
+                  className={`favorite-button ${favorited ? "active" : ""} ${sparkle ? "sparkle" : ""}`}
+                  onClick={handleFavoriteToggle}
+                  aria-label={favorited ? "Remove from favorites" : "Save to favorites"}
+                  title={favorited ? "Saved to notes" : "Save to notes"}
+                  type="button"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill={favorited ? "currentColor" : "none"}
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                  </svg>
+                  <span className="sparkle-burst sparkle-1" />
+                  <span className="sparkle-burst sparkle-2" />
+                  <span className="sparkle-burst sparkle-3" />
+                </button>
+              </div>
+
               <button
-                className={`favorite-button ${favorited ? "active" : ""} ${sparkle ? "sparkle" : ""}`}
-                onClick={handleFavoriteToggle}
-                aria-label={favorited ? "Remove from favorites" : "Save to favorites"}
-                title={favorited ? "Saved to notes" : "Save to notes"}
+                className={`speak-button ${isSpeaking ? 'speaking' : ''}`}
+                onClick={handleTextToSpeech}
+                title={isSpeaking ? 'Stop listening' : 'Listen to definition'}
+                type="button"
               >
-                <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill={favorited ? "currentColor" : "none"}
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                </svg>
-                <span className="sparkle-burst sparkle-1" />
-                <span className="sparkle-burst sparkle-2" />
-                <span className="sparkle-burst sparkle-3" />
-              </button>
-            </div>
-              <button className="speak-button">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -195,10 +261,14 @@ const handleFavoriteToggle = () => {
                 >
                   <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
                   <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                  {isSpeaking && (
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                  )}
                 </svg>
-                Listen
+                {isSpeaking ? 'Stop' : 'Listen'}
               </button>
             </div>
+
             {savedMessage && <p className="saved-message-inline">{savedMessage}</p>}
 
             <section className="info-section">
@@ -236,25 +306,23 @@ const handleFavoriteToggle = () => {
               <h2 className="section-title">Related Terms</h2>
               <div className="related-terms">
                 {resultData.relatedTerms && resultData.relatedTerms.map((term, index) => (
-                    <button
-                      key={index}
-                      type="button"
-                      className="related-term-button"
-                      onClick={() => handleCrossTermClick(term)}
-                    >
-                      {term}
-                    </button>
-                  ))}
+                  <button
+                    key={index}
+                    type="button"
+                    className="related-term-button"
+                    onClick={() => handleCrossTermClick(term)}
+                  >
+                    {term}
+                  </button>
+                ))}
               </div>
             </section>
 
-            {/* UMLS Medical Classification Section */}
             {resultData.umls && (
               <section className="info-section umls-section">
                 <h2 className="section-title">Medical Classification (UMLS)</h2>
 
                 <div className="umls-content">
-                  {/* CUI and Preferred Name */}
                   <div className="umls-subsection">
                     <h3 className="umls-subtitle">Concept Identifier</h3>
                     <p className="umls-cui">
@@ -265,7 +333,6 @@ const handleFavoriteToggle = () => {
                     </p>
                   </div>
 
-                  {/* Semantic Types */}
                   {resultData.umls.semanticTypes && resultData.umls.semanticTypes.length > 0 && (
                     <div className="umls-subsection">
                       <h3 className="umls-subtitle">Medical Categories</h3>
@@ -279,7 +346,6 @@ const handleFavoriteToggle = () => {
                     </div>
                   )}
 
-                  {/* ICD-10 Codes */}
                   {resultData.umls.icd10Codes && resultData.umls.icd10Codes.length > 0 && (
                     <div className="umls-subsection">
                       <h3 className="umls-subtitle">ICD-10 Codes</h3>
@@ -294,7 +360,6 @@ const handleFavoriteToggle = () => {
                     </div>
                   )}
 
-                  {/* SNOMED CT Codes */}
                   {resultData.umls.snomedCodes && resultData.umls.snomedCodes.length > 0 && (
                     <div className="umls-subsection">
                       <h3 className="umls-subtitle">SNOMED CT Codes</h3>
@@ -309,20 +374,20 @@ const handleFavoriteToggle = () => {
                     </div>
                   )}
 
-                  {/* UMLS Definitions */}
                   {resultData.umls.definitions && resultData.umls.definitions.length > 0 && (
                     <div className="umls-subsection">
                       <h3 className="umls-subtitle">Medical Definitions</h3>
                       {resultData.umls.definitions.map((def, index) => (
                         <div key={index} className="umls-definition">
-                          <p className="definition-source"><strong>Source:</strong> {def.source}</p>
+                          <p className="definition-source">
+                            <strong>Source:</strong> {def.source}
+                          </p>
                           <p className="definition-text">{def.value}</p>
                         </div>
                       ))}
                     </div>
                   )}
 
-                  {/* Source Vocabularies */}
                   {resultData.umls.sourceVocabularies && resultData.umls.sourceVocabularies.length > 0 && (
                     <div className="umls-subsection">
                       <h3 className="umls-subtitle">Available in Vocabularies</h3>
@@ -340,7 +405,9 @@ const handleFavoriteToggle = () => {
             )}
 
             <div className="disclaimer">
-              <strong>Important:</strong> {resultData.disclaimer || 'This information is for educational purposes only and should not replace professional medical advice. Always consult with a healthcare provider for accurate diagnosis and treatment.'}
+              <strong>Important:</strong>{" "}
+              {resultData.disclaimer ||
+                'This information is for educational purposes only and should not replace professional medical advice. Always consult with a healthcare provider for accurate diagnosis and treatment.'}
             </div>
           </>
         )}
