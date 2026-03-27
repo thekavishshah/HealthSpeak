@@ -269,7 +269,6 @@ function ResultsPage({ searchTerm, onNewSearch, onBack }) {
                   )}
                 </svg>
                 {isSpeaking ? 'Stop' : 'Listen'}
-                {isSpeaking ? 'Stop' : 'Listen'}
               </button>
             </div>
 
