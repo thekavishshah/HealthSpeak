@@ -41,7 +41,13 @@ export async function searchUMLSTerm(term) {
     }
 
     // Get the first (most relevant) result
-    const firstResult = searchResponse.data.result.results[0];
+    //const firstResult = searchResponse.data.result.results[0];
+    const termWords = term.toLowerCase().split(" ");
+    const firstResult = searchResponse.data.result.results.find(
+      cui => {
+        const word = cui.name.toLowerCase()
+        return termWords.every(curWord=> word.includes(curWord));
+      })
     const cui = firstResult.ui; // Concept Unique Identifier
     const name = firstResult.name;
 

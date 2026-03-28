@@ -26,7 +26,7 @@ class Symptom(models.Model):
     symptom_name = models.CharField(max_length=255)
 
 class Definition(models.Model):
-    termId = models.ManyToManyField(MedicalTerms)
+    termId = models.ForeignKey(MedicalTerms, on_delete = models.CASCADE, null=True, blank=True)
     termDef = models.TextField()
 
 class SearchHistory(models.Model):
