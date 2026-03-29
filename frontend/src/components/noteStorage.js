@@ -86,3 +86,18 @@ export function deleteEntry(id) {
   saveEntries(updated);
   return updated;
 }
+
+export function updateEntry(id, updates) {
+  const updated = getSavedEntries().map((entry) =>
+    entry.id === id
+      ? {
+          ...entry,
+          ...updates,
+          updatedAt: new Date().toISOString(),
+        }
+      : entry
+  );
+
+  saveEntries(updated);
+  return updated;
+}
