@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./NotePage.css";
-import { getSavedEntries, addManualNote, deleteEntry } from "./noteStorage";
+import { getSavedEntries, addManualNote, deleteEntry, updateEntry } from "./noteStorage";
 
 function NotePage({ onBack }) {
   const [entries, setEntries] = useState([]);
@@ -8,6 +8,9 @@ function NotePage({ onBack }) {
   const [noteTitle, setNoteTitle] = useState("");
   const [noteText, setNoteText] = useState("");
   const [savedMessage, setSavedMessage] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
+  const [editContent, setEditContent] = useState("");
 
   useEffect(() => {
     const saved = getSavedEntries();
@@ -40,6 +43,34 @@ function NotePage({ onBack }) {
     }
   };
 
+  const handleStartEdit = () => {
+  if (!selectedEntry || selectedEntry.type !== "manual") return;
+
+  setEditTitle(selectedEntry.title || "");
+  setEditContent(selectedEntry.content || "");
+  setIsEditing(true);
+};
+
+const handleSaveEdit = () => {
+  if (!selectedEntry) return;
+
+  const updated = updateEntry(selectedEntry.id, {
+    title: editTitle.trim() || "Untitled note",
+    content: editContent.trim(),
+  });
+
+  setEntries(updated);
+  setIsEditing(false);
+  setSavedMessage("Note updated!");
+  setTimeout(() => setSavedMessage(""), 2000);
+};
+
+const handleCancelEdit = () => {
+  setIsEditing(false);
+  setEditTitle("");
+  setEditContent("");
+};
+
   return (
     <div className="notes-page">
       <div className="notes-header">
@@ -65,7 +96,10 @@ function NotePage({ onBack }) {
                 <div
                   key={entry.id}
                   className={`notes-entry-card ${selectedId === entry.id ? "active" : ""}`}
-                  onClick={() => setSelectedId(entry.id)}
+                  onClick={() => {
+                    setSelectedId(entry.id);
+                    setIsEditing(false);
+                  }}
                 >
                   <div className="notes-entry-top">
                     <span className={`entry-badge ${entry.type}`}>
@@ -104,17 +138,53 @@ function NotePage({ onBack }) {
           <div className="notes-detail-card">
             {selectedEntry ? (
               <>
-                <span className={`entry-badge ${selectedEntry.type}`}>
-                  {selectedEntry.type === "favorite" ? "★ Favorited Term" : "Selected Note"}
-                </span>
+                <div className="detail-header-row">
+                  <span className={`entry-badge ${selectedEntry.type}`}>
+                    {selectedEntry.type === "favorite" ? "★ Favorited Term" : "Selected Note"}
+                  </span>
 
-                <h2>{selectedEntry.title}</h2>
-                <p className="entry-date">
-                  {new Date(selectedEntry.createdAt).toLocaleString()}
-                </p>
+                  {selectedEntry.type === "manual" && !isEditing && (
+                    <button className="edit-note-btn" onClick={handleStartEdit}>
+                      Edit
+                    </button>
+                  )}
+                </div>
 
-                <div className="entry-content">
-                  <p>{selectedEntry.content}</p>
+                {isEditing && selectedEntry.type === "manual" ? (
+                  <div className="edit-note-form">
+                    <input
+                      className="note-title-input"
+                      type="text"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      placeholder="Note title"
+                    />
+
+                    <textarea
+                      className="notes-textarea"
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      placeholder="Edit your note..."
+                    />
+
+                    <div className="edit-actions">
+                      <button className="save-btn" onClick={handleSaveEdit}>
+                        Save Changes
+                      </button>
+                      <button className="cancel-edit-btn" onClick={handleCancelEdit}>
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <h2>{selectedEntry.title}</h2>
+                    <p className="entry-date">
+                      {new Date(selectedEntry.createdAt).toLocaleString()}
+                    </p>
+
+                    <div className="entry-content">
+                      <p>{selectedEntry.content}</p>
 
                   {selectedEntry.symptoms?.length > 0 && (
                     <>
@@ -138,6 +208,8 @@ function NotePage({ onBack }) {
                     </>
                   )}
                 </div>
+              </>
+              )}
               </>
             ) : (
               <p className="empty-state">Select an entry to view it.</p>
