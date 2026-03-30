@@ -1,10 +1,24 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
-
+import Fuse from 'fuse.js'
 dotenv.config();
 
 const UMLS_BASE_URL = 'https://uts-ws.nlm.nih.gov/rest';
 const UMLS_VERSION = 'current';
+
+function scoreResult(term, umlsWord, umlsScore) {
+  const revTerm = term.toLowerCase();
+  const revUmlsWord = umlsWord.toLowerCase();
+  let score = 0;
+  score = score + (1-umlsScore) * 50;
+  if (revTerm === revUmlsWord) {
+    score = score + 100;
+  }
+  if(revUmlsWord.includes(revTerm)){
+    score = score + 20;
+  }
+  return score - Math.abs(umlsWord.length - term.length) * 0.3;
+}
 
 /**
  * Search UMLS for medical term and get CUI (Concept Unique Identifier)
@@ -25,8 +39,9 @@ export async function searchUMLSTerm(term) {
     const searchParams = {
       string: term,
       apiKey: apiKey,
-      pageSize: 5,
-      returnIdType: 'concept'
+      pageSize: 50,
+      returnIdType: 'concept',
+      searchType: 'normalizedString'
       //potential additional parameter: searchType: 'normalizedString'
     };
 
@@ -40,16 +55,59 @@ export async function searchUMLSTerm(term) {
       };
     }
 
+
+    
+
+    //We first filter out any names we have gotten in the results where if they contain unspecified, other, or nos
+    //They may be a specific version of the main term, but are not as important 
+    const cuiResults = searchResponse.data.result.results;
+    const cuiClean  = cuiResults.filter(r=>{
+      if(!r.name){
+        return false;
+      }
+      const revName = r.name.toLowerCase()
+      if (revName.includes("unspecified") || revName.includes("nos") || revName.includes("other")) {
+        return false;
+      }
+      return true;
+    })
+
+    //fuse.js is used to do Fuzzy searching between the given search term and each term in the filtered results
+    const fuse = new Fuse(cuiClean, {
+      keys: ['name'],
+      includeScore: true,
+      threshold: 0.3
+    })
+    const cuiFinalRes = fuse.search(term)
+    //const sortedCui = cuiFinalRes.sort((a,b) => a.score - b.score)
+
+    //Using map to go through all elements in the cuiFinalRes array after getting the simialrity scores from fuzzy matching
+    //We use "...r.item" where ... represent all elements in the r.item object.
+    //We add a finalScore attribute to each object i nthe list where we still have for each object a object of items and finalScore
+    const scoreCui = cuiFinalRes.map(r=>({
+      ...r,
+      finalScore: scoreResult(term, r.item.name,r.score)
+    }));
+    scoreCui.sort((a,b) => b.finalScorecore - a.finalScore)
+
+    
+
     // Get the first (most relevant) result
     //const firstResult = searchResponse.data.result.results[0];
+    /*
     const termWords = term.toLowerCase().split(" ");
     const firstResult = searchResponse.data.result.results.find(
       cui => {
         const word = cui.name.toLowerCase()
         return termWords.every(curWord=> word.includes(curWord));
       })
-    const cui = firstResult.ui; // Concept Unique Identifier
-    const name = firstResult.name;
+    */
+
+    const cui = scoreCui[0].item.ui; // Concept Unique Identifier
+    const name = scoreCui[0].item.name;
+
+    //const cui = firstResult.ui; // Concept Unique Identifier
+    //const name = firstResult.name;
 
     // Fetch detailed concept information
     const conceptData = await getConceptDetails(cui, apiKey);
