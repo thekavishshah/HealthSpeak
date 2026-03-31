@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './ResultsPage.css';
+import { addFavoriteTerm, isTermFavorited, removeFavoriteTerm } from "./noteStorage.js";
 
 const API_BASE_URL = 'http://localhost:3001';
 
@@ -9,6 +10,13 @@ function ResultsPage({ searchTerm, cachedData, onNewSearch, onBack }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [savedMessage, setSavedMessage] = useState("");
+  const [favorited, setFavorited] = useState(false);
+  const [sparkle, setSparkle] = useState(false);
+
+  useEffect(() => {
+    setQuery(searchTerm);
+  }, [searchTerm]);
 
   // Fetch medical term data from backend or use cached data
   useEffect(() => {
@@ -43,6 +51,7 @@ function ResultsPage({ searchTerm, cachedData, onNewSearch, onBack }) {
 
         if (data.success && data.data) {
           setResultData(data.data);
+          setFavorited(isTermFavorited(data.data.term));
         } else {
           throw new Error('Invalid response format');
         }
@@ -59,10 +68,10 @@ function ResultsPage({ searchTerm, cachedData, onNewSearch, onBack }) {
     }
   }, [searchTerm, cachedData]);
 
-  // Cleanup: Stop speech when component unmounts or search term changes
+  // Stop speech when component unmounts or search term changes
   useEffect(() => {
     return () => {
-      if (window.speechSynthesis) {
+      if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
     };
@@ -73,21 +82,46 @@ function ResultsPage({ searchTerm, cachedData, onNewSearch, onBack }) {
     onNewSearch(query);
   };
 
+  const handleCrossTermClick = (term) => {
+    setQuery(term);
+    onNewSearch(term);
+  };
+
+  const handleFavoriteToggle = () => {
+    if (!resultData) return;
+
+    setSparkle(true);
+    setTimeout(() => setSparkle(false), 500);
+
+    if (favorited) {
+      removeFavoriteTerm(resultData.term);
+      setFavorited(false);
+      setSavedMessage("Removed from notes.");
+    } else {
+      const result = addFavoriteTerm(resultData);
+      setFavorited(true);
+      setSavedMessage(
+        result.added ? "Added to notes page." : "This term is already saved."
+      );
+    }
+
+    setTimeout(() => setSavedMessage(""), 2000);
+  };
+
   const handleTextToSpeech = () => {
-    // Check if browser supports speech synthesis
+    if (!resultData) return;
+
     if (!('speechSynthesis' in window)) {
       alert('Sorry, your browser does not support text-to-speech.');
       return;
     }
 
-    // If currently speaking, stop it
     if (isSpeaking) {
       window.speechSynthesis.cancel();
       setIsSpeaking(false);
       return;
     }
 
-    // Create text content to speak
     let textToSpeak = `${resultData.term}. `;
     textToSpeak += `Definition: ${resultData.definition}. `;
 
@@ -99,15 +133,12 @@ function ResultsPage({ searchTerm, cachedData, onNewSearch, onBack }) {
       textToSpeak += `Possible causes include: ${resultData.causes.join(', ')}. `;
     }
 
-    // Create speech synthesis utterance
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
 
-    // Set speech properties
-    utterance.rate = 0.9; // Slightly slower for medical terms
+    utterance.rate = 0.9;
     utterance.pitch = 1;
     utterance.volume = 1;
 
-    // Handle speech events
     utterance.onstart = () => {
       setIsSpeaking(true);
     };
@@ -121,14 +152,14 @@ function ResultsPage({ searchTerm, cachedData, onNewSearch, onBack }) {
       setIsSpeaking(false);
     };
 
-    // Start speaking
+    window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
   };
 
   return (
     <div className="results-page">
       <div className="search-bar-compact">
-        <button onClick={onBack} className="back-button">
+        <button onClick={onBack} className="back-button" type="button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -143,6 +174,7 @@ function ResultsPage({ searchTerm, cachedData, onNewSearch, onBack }) {
           </svg>
           Back
         </button>
+
         <form onSubmit={handleSearch} className="search-form-compact">
           <div className="search-box-compact">
             <svg
@@ -182,7 +214,11 @@ function ResultsPage({ searchTerm, cachedData, onNewSearch, onBack }) {
             <h2>Unable to Load Information</h2>
             <p>{error}</p>
             <p>Please make sure the backend server is running on port 3001.</p>
-            <button onClick={() => window.location.reload()} className="retry-button">
+            <button
+              onClick={() => window.location.reload()}
+              className="retry-button"
+              type="button"
+            >
               Try Again
             </button>
           </div>
@@ -191,11 +227,38 @@ function ResultsPage({ searchTerm, cachedData, onNewSearch, onBack }) {
         {!loading && !error && resultData && (
           <>
             <div className="term-header">
-              <h1 className="term-title">{resultData.term}</h1>
+              <div className="term-title-row">
+                <h1 className="term-title">{resultData.term}</h1>
+
+                <button
+                  className={`favorite-button ${favorited ? "active" : ""} ${sparkle ? "sparkle" : ""}`}
+                  onClick={handleFavoriteToggle}
+                  aria-label={favorited ? "Remove from favorites" : "Save to favorites"}
+                  title={favorited ? "Saved to notes" : "Save to notes"}
+                  type="button"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill={favorited ? "currentColor" : "none"}
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                  </svg>
+                  <span className="sparkle-burst sparkle-1" />
+                  <span className="sparkle-burst sparkle-2" />
+                  <span className="sparkle-burst sparkle-3" />
+                </button>
+              </div>
+
               <button
                 className={`speak-button ${isSpeaking ? 'speaking' : ''}`}
                 onClick={handleTextToSpeech}
                 title={isSpeaking ? 'Stop listening' : 'Listen to definition'}
+                type="button"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -211,10 +274,15 @@ function ResultsPage({ searchTerm, cachedData, onNewSearch, onBack }) {
                   {isSpeaking && (
                     <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
                   )}
+                  {isSpeaking && (
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                  )}
                 </svg>
                 {isSpeaking ? 'Stop' : 'Listen'}
               </button>
             </div>
+
+            {savedMessage && <p className="saved-message-inline">{savedMessage}</p>}
 
             <section className="info-section">
               <h2 className="section-title">What is it?</h2>
@@ -225,10 +293,15 @@ function ResultsPage({ searchTerm, cachedData, onNewSearch, onBack }) {
               <h2 className="section-title">Common Symptoms</h2>
               <div className="symptom-grid">
                 {resultData.symptoms && resultData.symptoms.map((symptom, index) => (
-                  <div key={index} className="symptom-card">
+                  <button
+                    key={index}
+                    type="button"
+                    className="symptom-card clickable-card"
+                    onClick={() => handleCrossTermClick(symptom)}
+                  >
                     <div className="symptom-icon">•</div>
                     <span>{symptom}</span>
-                  </div>
+                  </button>
                 ))}
               </div>
             </section>
@@ -246,20 +319,23 @@ function ResultsPage({ searchTerm, cachedData, onNewSearch, onBack }) {
               <h2 className="section-title">Related Terms</h2>
               <div className="related-terms">
                 {resultData.relatedTerms && resultData.relatedTerms.map((term, index) => (
-                  <button key={index} className="related-term-button">
+                  <button
+                    key={index}
+                    type="button"
+                    className="related-term-button"
+                    onClick={() => handleCrossTermClick(term)}
+                  >
                     {term}
                   </button>
                 ))}
               </div>
             </section>
 
-            {/* UMLS Medical Classification Section */}
             {resultData.umls && (
               <section className="info-section umls-section">
                 <h2 className="section-title">Medical Classification (UMLS)</h2>
 
                 <div className="umls-content">
-                  {/* CUI and Preferred Name */}
                   <div className="umls-subsection">
                     <h3 className="umls-subtitle">Concept Identifier</h3>
                     <p className="umls-cui">
@@ -270,7 +346,6 @@ function ResultsPage({ searchTerm, cachedData, onNewSearch, onBack }) {
                     </p>
                   </div>
 
-                  {/* Semantic Types */}
                   {resultData.umls.semanticTypes && resultData.umls.semanticTypes.length > 0 && (
                     <div className="umls-subsection">
                       <h3 className="umls-subtitle">Medical Categories</h3>
@@ -284,7 +359,6 @@ function ResultsPage({ searchTerm, cachedData, onNewSearch, onBack }) {
                     </div>
                   )}
 
-                  {/* ICD-10 Codes */}
                   {resultData.umls.icd10Codes && resultData.umls.icd10Codes.length > 0 && (
                     <div className="umls-subsection">
                       <h3 className="umls-subtitle">ICD-10 Codes</h3>
@@ -299,7 +373,6 @@ function ResultsPage({ searchTerm, cachedData, onNewSearch, onBack }) {
                     </div>
                   )}
 
-                  {/* SNOMED CT Codes */}
                   {resultData.umls.snomedCodes && resultData.umls.snomedCodes.length > 0 && (
                     <div className="umls-subsection">
                       <h3 className="umls-subtitle">SNOMED CT Codes</h3>
@@ -314,20 +387,20 @@ function ResultsPage({ searchTerm, cachedData, onNewSearch, onBack }) {
                     </div>
                   )}
 
-                  {/* UMLS Definitions */}
                   {resultData.umls.definitions && resultData.umls.definitions.length > 0 && (
                     <div className="umls-subsection">
                       <h3 className="umls-subtitle">Medical Definitions</h3>
                       {resultData.umls.definitions.map((def, index) => (
                         <div key={index} className="umls-definition">
-                          <p className="definition-source"><strong>Source:</strong> {def.source}</p>
+                          <p className="definition-source">
+                            <strong>Source:</strong> {def.source}
+                          </p>
                           <p className="definition-text">{def.value}</p>
                         </div>
                       ))}
                     </div>
                   )}
 
-                  {/* Source Vocabularies */}
                   {resultData.umls.sourceVocabularies && resultData.umls.sourceVocabularies.length > 0 && (
                     <div className="umls-subsection">
                       <h3 className="umls-subtitle">Available in Vocabularies</h3>
@@ -345,7 +418,9 @@ function ResultsPage({ searchTerm, cachedData, onNewSearch, onBack }) {
             )}
 
             <div className="disclaimer">
-              <strong>Important:</strong> {resultData.disclaimer || 'This information is for educational purposes only and should not replace professional medical advice. Always consult with a healthcare provider for accurate diagnosis and treatment.'}
+              <strong>Important:</strong>{" "}
+              {resultData.disclaimer ||
+                'This information is for educational purposes only and should not replace professional medical advice. Always consult with a healthcare provider for accurate diagnosis and treatment.'}
             </div>
           </>
         )}

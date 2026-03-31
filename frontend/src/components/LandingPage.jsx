@@ -5,6 +5,7 @@ import TutorialOverlay from "./TutorialOverlay";
 function LandingPage({
   onSearch,
   onLogout,
+  onOpenNotes,
   showTutorial,
   onCloseTutorial,
   tutorialRunId,
@@ -15,6 +16,15 @@ function LandingPage({
   const searchBoxRef = useRef(null);
   const searchButtonRef = useRef(null);
   const quickLinksRef = useRef(null);
+  const [sparkle, setSparkle] = useState(false);
+  const favoritesRef = useRef(null);
+
+  const handleFavoritesClick = () => {
+    setSparkle(true);
+    onOpenNotes?.();
+
+    setTimeout(() => setSparkle(false), 400);
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -48,6 +58,12 @@ function LandingPage({
         text: "These quick buttons help users try common terms right away.",
         placement: "top",
       },
+      {
+        targetRef: favoritesRef,
+        title: "Favorites and notes",
+        text: "Click this star to open your notes page and view saved terms.",
+        placement: "left",
+      },
     ];
 
     if (sidebarHistoryRef) {
@@ -73,6 +89,28 @@ function LandingPage({
 
   return (
     <div className="landing-page">
+      <button
+          ref={favoritesRef}
+          className={`favorites-shortcut ${sparkle ? "sparkle" : ""}`}
+          onClick={handleFavoritesClick}
+          aria-label="Open notes"
+          title="Open notes"
+        >
+         <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+          <span className="sparkle-burst sparkle-1" />
+          <span className="sparkle-burst sparkle-2" />
+          <span className="sparkle-burst sparkle-3" />
+        </button>
       <div className="landing-content">
         <h1 className="app-title">HealthSpeak</h1>
         <p className="app-subtitle">

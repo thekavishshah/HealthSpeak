@@ -7,7 +7,7 @@ import Login from './components/Login';
 import SignUp from './components/SignUp';
 import ForgotId from './components/ForgotId.jsx';
 import HomePage from './components/HomePage.jsx';
-import SettingsButton from "./components/SettingsButton";
+import SettingsButton from "./components/SettingsButton"; 
 import SettingsModal from "./components/SettingsBar.jsx";
 import {useSettings} from "./context/SettingsContext";
 import NotePage from "./components/NotePage.jsx";
@@ -17,7 +17,6 @@ function App() {
   const [authView, setAuthView] = useState('home') // 'login' or 'signup'
   const [currentView, setCurrentView] = useState('landing') // 'landing' or 'results'
   const [searchTerm, setSearchTerm] = useState('')
-  const [cachedResultData, setCachedResultData] = useState(null)
   //const [showSettings, setShowSettings] = useState(false);  //settings button
   const {showSettings, setShowSettings} = useSettings();
   const [showTutorial, setShowTutorial] = useState(false);
@@ -30,12 +29,6 @@ function App() {
     setCurrentView('notes');
   }
 
-  const handleHistoryClick = (term, resultData) => {
-    setSearchTerm(term);
-    setCachedResultData(resultData);
-    setCurrentView('results');
-  }
-
   const handleLogin = () => {
     setIsAuthenticated(true)
   }
@@ -46,14 +39,12 @@ function App() {
 
   const handleSearch = (term) => {
     setSearchTerm(term)
-    setCachedResultData(null) // Clear cached data for new searches
     setCurrentView('results')
   }
 
   const handleBackToHome = () => {
     setCurrentView('landing')
     setSearchTerm('')
-    setCachedResultData(null)
   }
 
   const handleLogout = () => {
@@ -106,10 +97,10 @@ const handleReplayTutorial = () => {
     <div className="app">
       <Sidebar
         onOpenNotes={handleOpenNotes}
-        onHistoryClick={handleHistoryClick}
         onGoHome={handleBackToHome}
         sidebarHistoryRef={sidebarHistoryRef}
         notesRef={notesRef}
+        //logoutButtonRef={logoutButtonRef}
       />
       {/* Settings icon: visible on all pages*/}
       <SettingsButton onClick={() => setShowSettings(true)} />
@@ -128,7 +119,6 @@ const handleReplayTutorial = () => {
       {currentView === 'results' && (
         <ResultsPage
           searchTerm={searchTerm}
-          cachedData={cachedResultData}
           onNewSearch={handleSearch}
           onBack={handleBackToHome}
         />

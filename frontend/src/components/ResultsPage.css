@@ -17,6 +17,93 @@
   gap: 1rem;
 }
 
+.term-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.favorite-button {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.favorite-button:hover,
+.favorite-button:active,
+.favorite-button:focus,
+.favorite-button:focus-visible {
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+.favorite-button svg {
+  width: 22px;
+  height: 22px;
+  transition: transform 0.2s ease, color 0.2s ease, filter 0.2s ease;
+}
+
+.favorite-button:hover svg {
+  transform: scale(1.15);
+  color: #f5c542;
+}
+
+.favorite-button.active {
+  color: #f5c542;
+}
+
+.favorite-button.sparkle svg {
+  animation: star-pop 0.45s ease;
+}
+
+.favorite-button {
+  position: relative;
+}
+
+.favorite-button .sparkle-burst {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #f5c542;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.favorite-button.sparkle .sparkle-1 {
+  animation: burst-1 0.45s ease;
+}
+
+.favorite-button.sparkle .sparkle-2 {
+  animation: burst-2 0.45s ease;
+}
+
+.favorite-button.sparkle .sparkle-3 {
+  animation: burst-3 0.45s ease;
+}
+
+.saved-message-inline {
+  margin-top: -1rem;
+  margin-bottom: 1.5rem;
+  color: #5b3b8a;
+  font-weight: 600;
+}
+
 .back-button {
   display: flex;
   align-items: center;
