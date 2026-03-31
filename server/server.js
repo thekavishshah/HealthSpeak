@@ -5,7 +5,7 @@ import bodyParser from 'body-parser';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-import { searchMedicalTerm, getChatResponse } from './services/aiService.js';
+import { searchMedicalTerm, summarizeUMLSDefinition, getChatResponse } from './services/aiService.js';
 import { searchUMLSTerm } from './services/umlsService.js';
 import {
   initializeDatabase,
@@ -223,8 +223,23 @@ app.post('/api/search', async (req, res) => {
       console.log(`Using cached UMLS data for: ${term}`);
     }
 
-    // 3. Fetch AI-generated explanation from OpenAI
-    const aiResult = await searchMedicalTerm(term);
+    // 3. Get AI-generated explanation
+    // If UMLS has definitions, use AI to summarize them (more accurate)
+    // Otherwise, fall back to AI generating from scratch
+    let aiResult;
+
+    if (umlsData && umlsData.definitions && umlsData.definitions.length > 0) {
+      console.log(`Using UMLS-based AI summarization for: ${term}`);
+      try {
+        aiResult = await summarizeUMLSDefinition(term, umlsData.definitions);
+      } catch (summarizeError) {
+        console.warn(`UMLS summarization failed, falling back to AI-only generation:`, summarizeError);
+        aiResult = await searchMedicalTerm(term);
+      }
+    } else {
+      console.log(`No UMLS definitions found, using AI-only generation for: ${term}`);
+      aiResult = await searchMedicalTerm(term);
+    }
 
     if (!aiResult.success) {
       // If AI fails but we have UMLS data, still return UMLS data

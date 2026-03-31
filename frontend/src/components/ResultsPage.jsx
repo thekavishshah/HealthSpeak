@@ -3,16 +3,26 @@ import './ResultsPage.css';
 
 const API_BASE_URL = 'http://localhost:3001';
 
-function ResultsPage({ searchTerm, onNewSearch, onBack }) {
+function ResultsPage({ searchTerm, cachedData, onNewSearch, onBack }) {
   const [query, setQuery] = useState(searchTerm);
   const [resultData, setResultData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
-  // Fetch medical term data from backend
+  // Fetch medical term data from backend or use cached data
   useEffect(() => {
     const fetchMedicalTerm = async () => {
+      // If we have cached data, use it immediately
+      if (cachedData) {
+        console.log('Using cached result data');
+        setResultData(cachedData);
+        setFavorited(isTermFavorited(cachedData.term));
+        setLoading(false);
+        return;
+      }
+
+      // Otherwise, fetch from API
       setLoading(true);
       setError(null);
 
@@ -47,7 +57,7 @@ function ResultsPage({ searchTerm, onNewSearch, onBack }) {
     if (searchTerm) {
       fetchMedicalTerm();
     }
-  }, [searchTerm]);
+  }, [searchTerm, cachedData]);
 
   // Cleanup: Stop speech when component unmounts or search term changes
   useEffect(() => {

@@ -69,6 +69,76 @@ Return ONLY the JSON object, no additional text.`;
 }
 
 /**
+ * Summarize UMLS medical definitions into patient-friendly language
+ * @param {string} term - The medical term
+ * @param {Array} umlsDefinitions - Array of UMLS definition objects with source and value
+ * @returns {Promise<Object>} Structured medical information with AI-summarized definition
+ */
+export async function summarizeUMLSDefinition(term, umlsDefinitions) {
+  try {
+    // Format UMLS definitions for the prompt
+    const definitionsText = umlsDefinitions
+      .map(def => `Source: ${def.source}\n${def.value}`)
+      .join('\n\n---\n\n');
+
+    const prompt = `You are a medical information assistant for HealthSpeak, a platform that simplifies medical terminology for patients.
+
+Below are authoritative medical definitions from UMLS (Unified Medical Language System) for the term: "${term}"
+
+${definitionsText}
+
+Based on these authoritative medical sources, provide comprehensive information in the following JSON format:
+{
+  "term": "the medical term",
+  "definition": "a clear, patient-friendly summary of the UMLS definitions above in 2-3 sentences, avoiding complex medical jargon while staying true to the source material",
+  "symptoms": ["symptom1", "symptom2", "symptom3", "symptom4", "symptom5", "symptom6"],
+  "causes": ["cause1", "cause2", "cause3", "cause4"],
+  "relatedTerms": ["related term 1", "related term 2", "related term 3", "related term 4"]
+}
+
+Guidelines:
+- Your definition MUST be based on the UMLS sources provided above
+- Simplify medical jargon into language a patient without medical training can understand
+- Maintain medical accuracy - do not add information not supported by the sources
+- For symptoms, provide 6 common symptoms (if applicable to this condition)
+- For causes, provide 4 common or possible causes
+- For related terms, provide 4 medically related concepts
+- Keep explanations concise and patient-friendly
+
+Return ONLY the JSON object, no additional text.`;
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a helpful medical information assistant. Always respond with valid JSON only. Base your responses on the authoritative medical sources provided.'
+        },
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      temperature: 0.5, // Lower temperature for more faithful summarization
+      response_format: { type: 'json_object' }
+    });
+
+    const text = completion.choices[0].message.content;
+
+    // Parse the JSON response
+    const parsedResponse = JSON.parse(text);
+
+    return {
+      success: true,
+      data: parsedResponse
+    };
+  } catch (error) {
+    console.error('OpenAI API Error (summarizeUMLSDefinition):', error);
+    throw new Error(`Failed to summarize UMLS definition: ${error.message}`);
+  }
+}
+
+/**
  * Generate a conversational response for a medical query
  * @param {string} query - User's question or search query
  * @param {Array} chatHistory - Previous conversation history
@@ -133,5 +203,6 @@ Guidelines:
 
 export default {
   searchMedicalTerm,
+  summarizeUMLSDefinition,
   getChatResponse
 };
