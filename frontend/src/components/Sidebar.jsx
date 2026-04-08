@@ -10,6 +10,7 @@ function Sidebar({
   onSelectSession,
   onNewChat,
   onSearchTerm,
+  onDeleteSession,
 }) {
   return (
     <div className="sidebar">
@@ -17,7 +18,6 @@ function Sidebar({
         <button className="home-btn" onClick={onGoHome}>
           Home
         </button>
-
         <button className="new-chat-button" onClick={onNewChat}>
           + New Chat
         </button>
@@ -25,7 +25,6 @@ function Sidebar({
 
       <div className="chat-history" ref={sidebarHistoryRef}>
         <h3>Chat History</h3>
-
         <div className="history-list">
           {sessions.length === 0 ? (
             <div className="history-empty">No chats yet</div>
@@ -33,11 +32,22 @@ function Sidebar({
             sessions.map((session) => (
               <div
                 key={session.id}
-                className={`history-item ${
-                  activeSessionId === session.id ? "active" : ""
-                }`}
+                className={`history-item ${activeSessionId === session.id ? "active" : ""}`}
                 onClick={() => onSelectSession(session)}
               >
+                <button
+                  type="button"
+                  className="delete-chat-button"
+                  aria-label={`Delete ${session.title}`}
+                  title="Delete chat"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDeleteSession(session.id);
+                  }}
+                >
+                  ×
+                </button>
+
                 <div className="history-title">{session.title}</div>
 
                 <div className="history-terms">
