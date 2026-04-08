@@ -67,7 +67,7 @@ export async function initializeDatabase() {
       )
     `);
 
-    // Create medical terms cache table (to reduce API calls)
+    // Create medical terms i table (to reduce API calls)
     await client.query(`
       CREATE TABLE IF NOT EXISTS medical_terms_cache (
         id SERIAL PRIMARY KEY,
