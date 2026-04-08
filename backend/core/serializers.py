@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import PatientUser
+from .models import PatientUser, MedicalTerms
 import random
 from django.db import IntegrityError
 from django.db import models
@@ -32,3 +32,12 @@ class PatientUserSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
+class TermDataSerializer(serializers.ModeSerializer):
+    class Meta:
+        model=MedicalTerms
+        fields=['user_term', 'cui' ,'full_term','term_data']
+    
+    def create(self, data_entry):
+        instance, created = MedicalTerms.objects.get_or_create(
+        
+        )

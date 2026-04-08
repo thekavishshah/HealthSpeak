@@ -7,8 +7,8 @@ const UMLS_BASE_URL = 'https://uts-ws.nlm.nih.gov/rest';
 const UMLS_VERSION = 'current';
 
 function scoreResult(term, umlsWord, umlsScore) {
-  const revTerm = term.toLowerCase();
-  const revUmlsWord = umlsWord.toLowerCase();
+  const revTerm = term.toLowerCase().replace(/[^a-z0-9 ]/g, '')
+  const revUmlsWord = umlsWord.toLowerCase().replace(/[^a-z0-9 ]/g,'');
   let score = 0;
   score = score + (1-umlsScore) * 50;
   if (revTerm === revUmlsWord) {
@@ -37,7 +37,7 @@ export async function searchUMLSTerm(term) {
     // Search for the term
     const searchUrl = `${UMLS_BASE_URL}/search/${UMLS_VERSION}`;
     const searchParams = {
-      string: term,
+      string: term.toLowerCase().trim(),
       apiKey: apiKey,
       pageSize: 50,
       returnIdType: 'concept',
@@ -88,7 +88,7 @@ export async function searchUMLSTerm(term) {
       ...r,
       finalScore: scoreResult(term, r.item.name,r.score)
     }));
-    scoreCui.sort((a,b) => b.finalScorecore - a.finalScore)
+    scoreCui.sort((a,b) => b.finalScore - a.finalScore)
 
     
 

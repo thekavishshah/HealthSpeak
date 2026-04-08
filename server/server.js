@@ -5,7 +5,7 @@ import bodyParser from 'body-parser';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-import { searchMedicalTerm, getChatResponse } from './services/aiService.js';
+import { searchMedicalTerm, getChatResponse, summarizeUMLS } from './services/aiService.js';
 import { searchUMLSTerm } from './services/umlsService.js';
 import {
   initializeDatabase,
@@ -191,6 +191,7 @@ app.post('/api/search', async (req, res) => {
     // Initialize response object
     let combinedData = {
       term: term,
+      preferredName: '',
       definition: '',
       symptoms: [],
       causes: [],
@@ -199,7 +200,15 @@ app.post('/api/search', async (req, res) => {
     };
 
     // 1. Check UMLS cache first
+    //I will call a api defined function in Django using axios instead. I'll do this later
     let umlsData = await getCachedUMLSData(term);
+
+    //commented out for now as integration to database not setup yet
+    /*
+    if (umlsData) {
+      return umlsData;
+    }
+    */
 
     // 2. If not cached, fetch from UMLS API
     if (!umlsData) {
@@ -222,11 +231,106 @@ app.post('/api/search', async (req, res) => {
     } else {
       console.log(`Using cached UMLS data for: ${term}`);
     }
-
+    
     // 3. Fetch AI-generated explanation from OpenAI
     const aiResult = await searchMedicalTerm(term);
+    if(!umlsData && !aiResult.success) {
+      return res.status(500).json({
+        error: 'Error fetching medical information',
+        details: aiResult.error
+      });
+    }
+    if(!umlsData && aiResult.success) {
+      return res.json({
+        success: true,
+        data: aiResult.data
+      })
+    }
+    const cleanedUMLSData = await summarizeUMLS(umlsData);
+    if (!cleanedUMLSData.success || !cleanedUMLSData.data) {
+        if (aiResult.success) {
+          return res.json({
+            success: true,
+            data: aiResult.data
+          })
+        }
+        else {
+          return res.status(500).json({
+            error: 'Error fetching medical information',
+            details: aiResult.error
+          });
+        }
+    
+    }
+    if(!aiResult.success && cleanedUMLSData.success && cleanedUMLSData.data) {
+      return res.json ({
+        success: true,
+        data: {
+          term: term,
+          preferredName: umlsData.preferredName,
+          definition: cleanedUMLSData.data.definition === "" 
+          ? "No Definition Available"
+          : cleanedUMLSData.data.definition,
+          symptoms: (cleanedUMLSData.data.symptoms || []).length > 0
+          ? cleanedUMLSData.data.symptoms.slice(0,6)
+          : [],
+          causes: [],
+          relatedTerms: (cleanedUMLSData.data.related_terms || []).length > 0
+          ? cleanedUMLSData.data.related_terms.slice(0,6)
+          : []
+        }
+      })
+    }
+    
+    const umlsDef = cleanedUMLSData.data.definition;
+    const umlsSymptoms = cleanedUMLSData.data.symptoms || [];
+    const umlsRelations = cleanedUMLSData.data.related_terms || [];
 
-    if (!aiResult.success) {
+    const aiDef = aiResult.success ? aiResult.data.definition : "";
+    const aiSymptoms = aiResult.success ? aiResult.data.symptoms || [] : [];
+    const aiCauses = aiResult.success ? aiResult.data.causes || [] : [];
+    const aiRelated = aiResult.success ? aiResult.data.relatedTerms || [] : [];
+
+    combinedData.preferredName = umlsData.preferredName
+
+    if (umlsDef && umlsDef != "") {
+      combinedData.definition = umlsDef
+    }
+    else {
+      combinedData.definition = aiDef
+    }
+    const allSymptoms = [...new Set([...umlsSymptoms, ...aiSymptoms,])];
+    const finalSymptoms = allSymptoms.slice(0,6);
+    const allRelations = [...new Set([...umlsRelations, ...aiRelated,])];
+    const finalRelations = allRelations.slice(0,6);
+
+    combinedData.symptoms = finalSymptoms
+    combinedData.causes = aiCauses
+    combinedData.relatedTerms = finalRelations
+    combinedData.umls = umlsData
+
+    normalized_term = term.trim().toLowerCase()
+
+    const response = await fetch("http://localhost:8000/api/addTerm/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        term: normalized_term,
+        cui: umlsData.cui,
+        preferredTerm: umlsData.preferredName,
+        data: combinedData
+      }),
+    })
+
+    
+    res.json({
+      success: true,
+      data: combinedData
+    });
+/*
+   if (!aiResult.success) {
       // If AI fails but we have UMLS data, still return UMLS data
       if (umlsData) {
         return res.json({
@@ -270,7 +374,7 @@ app.post('/api/search', async (req, res) => {
       success: true,
       data: combinedData
     });
-
+*/
   } catch (error) {
     console.error('Search error:', error);
     res.status(500).json({

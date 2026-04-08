@@ -1,9 +1,9 @@
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
-#from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
-from .serializers import PatientUserSerializer
+from .serializers import PatientUserSerializer, TermDataSerializer
 from .models import PatientUser
 from django.core.mail import send_mail
 
@@ -51,37 +51,54 @@ def processUser(request):
                 return JsonResponse({"error": "400 Invalid request"}, status=400)
     except:
         return JsonResponse({"error": " Internal Server Error"}, status=500)
+    
+@csrf_exempt
+def addTerm(request):
+    print("We are now going to store the data in the database")
+    try:
+        if request.method == "POST":
+            data = JSONParser().parse(request)
+            data["term"] = data["term"].strip().lower()
+            serializer = TermDataSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                print(serializer.validated_data)
+                user_instance = serializer.instance
+    except:
+        return JsonResponse({"error": " Internal Server Error"}, status=500)
 
-    #Alternative to not using serializer for backend validation, conversion of JSON 
-    # to a instance of a database model and returning jSON response
-    """
-    if request.method == "POST":
-        data = json.loads(request.body)
-        user_firstName = data.get("firstName")
-        user_lastName = data.get("lastName")
-        user_email = data.get("email")
-        user_password = data.get("password")
-        idUnique = False
-        
-        while idUnique == False:
-            try:
-                patient_id = random.randint(10000, 99999)
-        
 
-                user = User.objects.create_user(
-                    patient_id = patient_id,
-                    username = (user_firstName + user_lastName).lower(),
-                    email = user_email,
-                    password=user_password
-                )
-                user.save()
-                idUnique = True
-            except IntegrityError:
-                continue
+#Alternative to not using serializer for backend validation, conversion of JSON 
+# to a instance of a database model and returning jSON response
 
-        return JsonResponse({
-            "message": "User created succesfully",
-            "patient_id": patient_id})
-    else:
-        return JsonResponse({"error": "Invalid request"}, status=400)
-    """
+"""
+if request.method == "POST":
+    data = json.loads(request.body)
+    user_firstName = data.get("firstName")
+    user_lastName = data.get("lastName")
+    user_email = data.get("email")
+    user_password = data.get("password")
+    idUnique = False
+    
+    while idUnique == False:
+        try:
+            patient_id = random.randint(10000, 99999)
+    
+
+            user = User.objects.create_user(
+                patient_id = patient_id,
+                username = (user_firstName + user_lastName).lower(),
+                email = user_email,
+                password=user_password
+            )
+            user.save()
+            idUnique = True
+        except IntegrityError:
+            continue
+
+    return JsonResponse({
+        "message": "User created succesfully",
+        "patient_id": patient_id})
+else:
+    return JsonResponse({"error": "Invalid request"}, status=400)
+"""
