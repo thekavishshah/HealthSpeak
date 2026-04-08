@@ -155,6 +155,39 @@ function App() {
     setCurrentView("results");
   };
 
+  const handleDeleteSession = (sessionId) => {
+    const sessionToDelete = chatSessions.find((session) => session.id === sessionId);
+    const confirmed = window.confirm(
+      `Delete "${sessionToDelete?.title || "this chat"}"?`
+    );
+
+    if (!confirmed) return;
+
+    const remainingSessions = chatSessions.filter(
+      (session) => session.id !== sessionId
+    );
+    setChatSessions(remainingSessions);
+
+    if (activeSessionId === sessionId) {
+      if (remainingSessions.length > 0) {
+        const nextSession = remainingSessions[0];
+        setActiveSessionId(nextSession.id);
+
+        if (nextSession.terms.length > 0) {
+          setSearchTerm(nextSession.terms[nextSession.terms.length - 1]);
+          setCurrentView("results");
+        } else {
+          setSearchTerm("");
+          setCurrentView("landing");
+        }
+      } else {
+        setActiveSessionId(null);
+        setSearchTerm("");
+        setCurrentView("landing");
+      }
+    }
+  };
+
   const handleSelectSession = (session) => {
     setActiveSessionId(session.id);
 
@@ -218,6 +251,7 @@ function App() {
           onSelectSession={handleSelectSession}
           onNewChat={createNewSession}
           onSearchTerm={handleSearchWithHistory}
+          onDeleteSession={handleDeleteSession}
         />
 
         <SettingsButton onClick={() => setShowSettings(true)} />
