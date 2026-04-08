@@ -1,39 +1,76 @@
-import { useState } from 'react';
 import './Sidebar.css';
 
-function Sidebar({ onOpenNotes, onGoHome, sidebarHistoryRef, notesRef}) {
-  const [chatHistory, setChatHistory] = useState([
-    { id: 1, title: 'Previous search 1', timestamp: '2 hours ago' },
-    { id: 2, title: 'Previous search 2', timestamp: 'Yesterday' },
-    { id: 3, title: 'Previous search 3', timestamp: '2 days ago' },
-  ]);
-
-
+function Sidebar({
+  onOpenNotes,
+  onGoHome,
+  sidebarHistoryRef,
+  notesRef,
+  sessions = [],
+  activeSessionId,
+  onSelectSession,
+  onNewChat,
+  onSearchTerm,
+}) {
   return (
     <div className="sidebar">
       <div className="sidebar-header">
         <button className="home-btn" onClick={onGoHome}>
           Home
         </button>
-        <button className="new-chat-button" onClick={onGoHome}>
+
+        <button className="new-chat-button" onClick={onNewChat}>
           + New Chat
         </button>
       </div>
 
       <div className="chat-history" ref={sidebarHistoryRef}>
         <h3>Chat History</h3>
+
         <div className="history-list">
-          {chatHistory.map((chat) => (
-            <div key={chat.id} className="history-item">
-              <div className="history-title">{chat.title}</div>
-              <div className="history-timestamp">{chat.timestamp}</div>
-            </div>
-          ))}
+          {sessions.length === 0 ? (
+            <div className="history-empty">No chats yet</div>
+          ) : (
+            sessions.map((session) => (
+              <div
+                key={session.id}
+                className={`history-item ${
+                  activeSessionId === session.id ? "active" : ""
+                }`}
+                onClick={() => onSelectSession(session)}
+              >
+                <div className="history-title">{session.title}</div>
+
+                <div className="history-terms">
+                  {session.terms.map((term, index) => (
+                    <button
+                      key={`${session.id}-${index}`}
+                      type="button"
+                      className="history-term-chip"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectSession(session);
+                        onSearchTerm(term);
+                      }}
+                    >
+                      {term}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="history-timestamp">{session.timestamp}</div>
+              </div>
+            ))
+          )}
         </div>
       </div>
-        <button ref={notesRef} className="new-chat-btn notes-btn" onClick={onOpenNotes}>
-          Notes
-        </button>
+
+      <button
+        ref={notesRef}
+        className="new-chat-btn notes-btn"
+        onClick={onOpenNotes}
+      >
+        Notes
+      </button>
     </div>
   );
 }
