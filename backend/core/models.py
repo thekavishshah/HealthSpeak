@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
 import json
 
 # Create your models here.
@@ -19,9 +20,9 @@ class PatientUser(AbstractUser):
         blank=True
     )
 class MedicalTerms(models.Model):
-    user_term = models.CharField(max_length=255, uniuque=True)
-    cui = models.CharField(max_length=50, unique=True, null=True, blank=True)
-    full_term = models.CharField(max_length=255)
+    user_term = models.CharField(max_length=255, unique=True, default = "")
+    cui = models.CharField(max_length=50, unique=True, default = "")
+    full_term = models.CharField(max_length=255, default = "")
     term_data = models.JSONField(default=dict)
 
 """ We can use this later for production with  first Normal form when dealing with many entries
@@ -36,7 +37,7 @@ class Definition(models.Model):
 class SearchHistory(models.Model):
     searchByUser = models.ForeignKey(PatientUser, on_delete=models.CASCADE)
     term_id = models.ForeignKey(MedicalTerms, on_delete=models.CASCADE)
-    search_time = models.DateTimeField(auto_now_add=True)
+    search_time = models.DateTimeField(default=timezone.now)
     updated_time = models.DateTimeField(auto_now=True)
 
 

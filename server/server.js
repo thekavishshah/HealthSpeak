@@ -201,17 +201,22 @@ app.post('/api/search', async (req, res) => {
 
     // 1. Check UMLS cache first
     //I will call a api defined function in Django using axios instead. I'll do this later
-    let umlsData = await getCachedUMLSData(term);
-
-    //commented out for now as integration to database not setup yet
-    /*
-    if (umlsData) {
-      return umlsData;
-    }
-    */
-
-    // 2. If not cached, fetch from UMLS API
-    if (!umlsData) {
+    //let umlsData = await getCachedUMLSData(term);
+    let preTerm = term.trim().toLowerCase()
+    console.log("Term: ", preTerm)
+    const url = `http://localhost:8000/api/getTerm/?term=${preTerm}`;
+    console.log("FETCHING:", url);
+    const response = await fetch(`http://localhost:8000/api/getTerm/?term=${preTerm}`, {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const resultData = await response.json();
+    let umlsData = {}
+    if (!response.ok) {
+    //if (!umlsData) {
+      // 2. If not cached, fetch from UMLS API
       console.log(`Fetching UMLS data for: ${term}`);
       const umlsResult = await searchUMLSTerm(term);
 
@@ -230,6 +235,10 @@ app.post('/api/search', async (req, res) => {
       }
     } else {
       console.log(`Using cached UMLS data for: ${term}`);
+      return res.json({
+        success:true,
+        data: resultData.data
+      });
     }
     
     // 3. Fetch AI-generated explanation from OpenAI
@@ -307,24 +316,33 @@ app.post('/api/search', async (req, res) => {
     combinedData.symptoms = finalSymptoms
     combinedData.causes = aiCauses
     combinedData.relatedTerms = finalRelations
-    combinedData.umls = umlsData
+    //combinedData.umls = umlsData
+    combinedData.umls = {
+      cui: umlsData.cui,
+      preferredName: umlsData.preferredName,
+      semanticTypes: umlsData.semanticTypes,
+      definitions: umlsData.definitions,
+      icd10Codes: umlsData.icd10Codes,
+      snomedCodes: umlsData.snomedCodes,
+      sourceVocabularies: umlsData.sourceVocabularies
+    }
 
-    normalized_term = term.trim().toLowerCase()
+   let  normalized_term = term.trim().toLowerCase()
 
-    const response = await fetch("http://localhost:8000/api/addTerm/", {
+    const saveResponse = await fetch("http://localhost:8000/api/addTerm/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        term: normalized_term,
+        user_term: normalized_term,
         cui: umlsData.cui,
-        preferredTerm: umlsData.preferredName,
-        data: combinedData
+        full_term: umlsData.preferredName,
+        term_data: combinedData
       }),
     })
 
-    
+
     res.json({
       success: true,
       data: combinedData

@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from .serializers import PatientUserSerializer, TermDataSerializer
-from .models import PatientUser
+from .models import PatientUser, MedicalTerms
 from django.core.mail import send_mail
 
 
@@ -58,12 +58,34 @@ def addTerm(request):
     try:
         if request.method == "POST":
             data = JSONParser().parse(request)
-            data["term"] = data["term"].strip().lower()
+            data["user_term"] = data["user_term"].strip().lower()
             serializer = TermDataSerializer(data=data)
             if serializer.is_valid():
                 serializer.save()
                 print(serializer.validated_data)
-                user_instance = serializer.instance
+                return JsonResponse({
+                    "message": "User created succesfully",
+                }, status=201)
+            else:
+                return JsonResponse({"error": "400 Invalid request"}, status=400)
+    except:
+        return JsonResponse({"error": " Internal Server Error"}, status=500)
+    
+@csrf_exempt
+def getTerm(request):
+    print("We are now getting the term data in the database")
+    try:
+        if request.method == "GET":
+            try:
+                userTerm = request.GET.get("term")
+                userTerm = userTerm.strip().lower()
+                #get will  return either a single model instance or throws a Does Not Exist error
+                modelData = MedicalTerms.objects.get(user_term=userTerm)
+                #Don't do serialization here as that takes longer for results on resultsPage.jsx to be displayed. 
+                #serializer = TermDataSerializer(modelData)
+                return JsonResponse({"data": modelData.term_data}, status=200)
+            except MedicalTerms.DoesNotExist:
+                return JsonResponse({"error": "Term data not found"}, status=404)
     except:
         return JsonResponse({"error": " Internal Server Error"}, status=500)
 
