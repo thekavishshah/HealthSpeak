@@ -8,6 +8,72 @@ const openai = new OpenAI({
 });
 
 /**
+ * Parse through the UMLS results and split relevant information from it into clear sections
+ * @param {{ data: Object }} umlsData
+ * @return {Promise<Object>}
+ */
+export async function summarizeUMLS(umlsData) {
+  try {
+    const revObject = {
+      preferredName: umlsData.preferredName,
+      medicalDefinitions: umlsData.definitions?.map(d => d.value).join('\n'),
+      relatedConcepts: umlsData.relatedConcepts?.map(rc => rc.name)  || []
+    };
+
+    const prompt = `
+    You are a medical information assistant for HealthSpeak, a platform that simplifies medical terminology for patients.
+
+    INPUT:
+    ${JSON.stringify(revObject)}
+
+    TASK:
+      1. Write a concise, clear definition (2-3 sentences max) using "medicalDefinitions".
+      2. Extract key symptoms from "medicalDefinitions". If none, return an empty list.
+      3. Copy ALL elements from "relatedConcepts" into "related_terms".
+      4. Do NOT include causes or treatments.
+      5. Simplify language and remove redundancy.
+
+
+    OUTPUT FORMAT (JSON ONLY). Make sure to store that related Concept list under the "related_terms" attribute:
+    {
+      "definition": "...",
+      "symptoms": ["symptom1", "symptom2", "symptom3", "symptom4", "symptom5", "symptom6"],
+      "related_terms": [relatedConcept1, relatedConcept2, relatedConcept3, ...]
+    }
+    `
+
+    const completion = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a helpful medical information assistant. Always respond with valid JSON only.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        response_format: { type: 'json_object' }
+      });
+      const text = completion.choices[0].message.content;
+
+    // Parse the JSON response
+    const parsedResponse = JSON.parse(text);
+
+    return {
+      success: true,
+      data: parsedResponse
+    };
+  }catch (error) {
+    console.error('OpenAI API Error:', error);
+    throw new Error(`Failed to fetch medical information: ${error.message}`);
+  }
+}
+
+
+/**
  * Search for a medical term and get comprehensive information
  * @param {string} term - The medical term to search for
  * @returns {Promise<Object>} Structured medical information

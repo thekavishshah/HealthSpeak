@@ -1,8 +1,7 @@
 from rest_framework import serializers
-from .models import PatientUser
+from .models import PatientUser, MedicalTerms
 import random
-from django.db import IntegrityError
-from django.db import models
+from django.db import IntegrityError, transaction
 
 class PatientUserSerializer(serializers.ModelSerializer):
     #We haven't gotten the required data for this field yet as we are actually getting random values for this field directly
@@ -32,3 +31,21 @@ class PatientUserSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
+class TermDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=MedicalTerms
+        fields=['user_term', 'cui' ,'full_term','term_data']
+    
+    @transaction.atomic
+    def create(self, validated_data):
+        instance, created = MedicalTerms.objects.get_or_create(
+            user_term = validated_data["user_term"],
+            cui = validated_data["cui"],
+            defaults={
+                'full_term': validated_data['full_term'],
+                'term_data': validated_data['term_data'],
+            }
+        )
+        #Since get_or_create when we need to create the instance aleady saves it in the database
+        #Just return the instance
+        return instance

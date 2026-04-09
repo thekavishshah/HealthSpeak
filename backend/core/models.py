@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
 import json
 
 # Create your models here.
@@ -19,19 +20,25 @@ class PatientUser(AbstractUser):
         blank=True
     )
 class MedicalTerms(models.Model):
-    term = models.TextField(unique=True)
+    user_term = models.CharField(max_length=255, unique=True, default = "")
+    cui = models.CharField(max_length=50, unique=True, default = "")
+    full_term = models.CharField(max_length=255, default = "")
+    term_data = models.JSONField(default=dict)
 
+""" We can use this later for production with  first Normal form when dealing with many entries
 class Symptom(models.Model):
-    termId = models.ManyToManyField(MedicalTerms)
+    termId = models.ForeignKey(MedicalTerms, on_delete = models.CASCADE)
     symptom_name = models.CharField(max_length=255)
 
 class Definition(models.Model):
-    termId = models.ForeignKey(MedicalTerms, on_delete = models.CASCADE, null=True, blank=True)
+    termId = models.ForeignKey(MedicalTerms, on_delete = models.CASCADE)
     termDef = models.TextField()
-
+"""
 class SearchHistory(models.Model):
     searchByUser = models.ForeignKey(PatientUser, on_delete=models.CASCADE)
     term_id = models.ForeignKey(MedicalTerms, on_delete=models.CASCADE)
+    search_time = models.DateTimeField(default=timezone.now)
+    updated_time = models.DateTimeField(auto_now=True)
 
 
     #Start with 3 symptoms, 3 causes, 3 related terms for each term
