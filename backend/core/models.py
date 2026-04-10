@@ -21,7 +21,7 @@ class PatientUser(AbstractUser):
     )
 class MedicalTerms(models.Model):
     user_term = models.CharField(max_length=255, unique=True, default = "")
-    cui = models.CharField(max_length=50, unique=True, default = "")
+    cui = models.CharField(max_length=50, default = "")
     full_term = models.CharField(max_length=255, default = "")
     term_data = models.JSONField(default=dict)
 
